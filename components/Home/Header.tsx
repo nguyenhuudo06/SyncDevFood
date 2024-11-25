@@ -12,8 +12,13 @@ import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import ImageWithFallback from "../Image/ImageWithFallback";
 
 const Header = () => {
+  const userData = useSelector((state: RootState) => state.auth);
+
   return (
     <View>
       <View>
@@ -32,7 +37,7 @@ const Header = () => {
                 <TouchableOpacity
                   onPress={() => router.push("../(tabs)/profile")}
                 >
-                  <Image
+                  {/* <Image
                     style={{
                       width: Spacing * 4.5,
                       height: Spacing * 4.5,
@@ -40,17 +45,22 @@ const Header = () => {
                       marginRight: Spacing,
                     }}
                     source={require("../../assets/images/avatart-template.jpg")}
+                  /> */}
+
+                  <ImageWithFallback
+                    source={{ uri: userData.user_avatar }}
+                    fallbackSource={require("../../assets/images/pngegg.png")}
+                    style={{
+                      width: Spacing * 4.5,
+                      height: Spacing * 4.5,
+                      borderRadius: Spacing * 3,
+                      marginRight: Spacing,
+                    }}
+                    resizeMode="cover"
                   />
                 </TouchableOpacity>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity style={{ marginRight: Spacing }}>
-                  <Ionicons
-                    name="notifications-outline"
-                    size={Spacing * 3.5}
-                    color={Colors.dark}
-                  />
-                </TouchableOpacity>
                 <TouchableOpacity>
                   <Ionicons
                     name="menu"
@@ -61,31 +71,35 @@ const Header = () => {
               </View>
             </View>
             <View style={{ marginTop: 15 }}>
-              <LinearGradient
-                colors={["#FFF0F0", "#F76D02B5"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: 10,
-                  marginVertical: 10,
-                  borderRadius: Spacing,
-                }}
+              <TouchableOpacity
+                onPress={() => router.push(`../../(tabs)/search`)}
               >
-                <Ionicons name="search" size={24} color={Colors.text} />
-                <TextInput
-                  placeholder="Search"
+                <LinearGradient
+                  colors={["#FFF0F0", "#F76D02B5"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={{
-                    fontSize: 16,
-                    fontFamily: "outfit-regular",
-                    flex: 1,
-                    borderWidth: 0,
-                    color: Colors.text,
-                    paddingLeft: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    padding: 10,
+                    marginVertical: 10,
+                    borderRadius: Spacing,
                   }}
-                />
-              </LinearGradient>
+                >
+                  <Ionicons name="search" size={24} color={Colors.text} />
+                  <TextInput
+                    placeholder="Search"
+                    style={{
+                      fontSize: 16,
+                      fontFamily: "outfit-regular",
+                      flex: 1,
+                      borderWidth: 0,
+                      color: Colors.text,
+                      paddingLeft: 10,
+                    }}
+                  />
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
           </View>
         </ImageBackground>

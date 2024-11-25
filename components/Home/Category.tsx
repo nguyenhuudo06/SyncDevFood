@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import CategoryItem from "./CategoryItem";
 import TabContent from "./TabContent";
+import FontSize from "@/constants/FontSize";
 
 const Category = () => {
   return (
@@ -17,14 +18,11 @@ const Category = () => {
       >
         <Text
           style={{
-            fontSize: 20,
+            fontSize: FontSize.medium,
             fontFamily: "outfit-bold",
           }}
         >
-          Category
-        </Text>
-        <Text style={{ color: "#29adff", fontFamily: "outfit-medium" }}>
-          View all
+          Explore
         </Text>
       </View>
       {/* <CategoryItem /> */}

@@ -142,357 +142,349 @@ const MyTabView = () => {
   }, [userId]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <HeaderPage titlePage="Personal Infor" />
-        <View style={{ padding: Spacing }}>
-          <View>
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "start",
-                gap: Spacing * 3,
-                alignItems: "center",
-                padding: Spacing * 2,
-                marginBottom: Spacing,
-                borderRadius: Spacing,
-                backgroundColor: "#faf6f3fa",
-              }}
-            >
-              <View>
-                <Entypo
-                  name="shopping-cart"
-                  size={Spacing * 2.4}
-                  color="#FFA500"
-                />
-              </View>
-              <View>
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: FontSize.medium,
-                    color: "#FFA500",
-                  }}
-                >
-                  Total Order
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: FontSize.medium,
-                  }}
-                >
-                  ({orderStats.total})
-                </Text>
-              </View>
+    <ScrollView style={styles.scrollView}>
+      <HeaderPage titlePage="Personal Infor" />
+      <View style={{ padding: Spacing }}>
+        <View>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "start",
+              gap: Spacing * 3,
+              alignItems: "center",
+              padding: Spacing * 2,
+              marginBottom: Spacing,
+              borderRadius: Spacing,
+              backgroundColor: "#faf6f3fa",
+            }}
+          >
+            <View>
+              <Entypo
+                name="shopping-cart"
+                size={Spacing * 2.4}
+                color="#FFA500"
+              />
             </View>
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "start",
-                gap: Spacing * 3,
-                alignItems: "center",
-                padding: Spacing * 2,
-                marginBottom: Spacing,
-                borderRadius: Spacing,
-                backgroundColor: "#faf6f3fa",
-              }}
-            >
-              <View>
-                <Entypo
-                  name="shopping-cart"
-                  size={Spacing * 2.4}
-                  color="#FFA500"
-                />
-              </View>
-              <View>
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: FontSize.medium,
-                    color: "#FFA500",
-                  }}
-                >
-                  Completed
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: FontSize.medium,
-                  }}
-                >
-                  ({orderStats.completed})
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "start",
-                gap: Spacing * 3,
-                alignItems: "center",
-                padding: Spacing * 2,
-                marginBottom: Spacing,
-                borderRadius: Spacing,
-                backgroundColor: "#faf6f3fa",
-              }}
-            >
-              <View>
-                <Entypo
-                  name="shopping-cart"
-                  size={Spacing * 2.4}
-                  color="#FFA500"
-                />
-              </View>
-              <View>
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: FontSize.medium,
-                    color: "#FFA500",
-                  }}
-                >
-                  Cancel
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "outfit-bold",
-                    fontSize: FontSize.medium,
-                  }}
-                >
-                  ({orderStats.cancelled})
-                </Text>
-              </View>
+            <View>
+              <Text
+                style={{
+                  fontFamily: "outfit-bold",
+                  fontSize: FontSize.medium,
+                  color: "#FFA500",
+                }}
+              >
+                Total Order
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "outfit-bold",
+                  fontSize: FontSize.medium,
+                }}
+              >
+                ({orderStats.total})
+              </Text>
             </View>
           </View>
-          {isVisibleEditInfo ? (
-            <View
-              style={{
-                width: "100%",
-                padding: Spacing * 2,
-                marginBottom: Spacing,
-                borderRadius: Spacing,
-                backgroundColor: "#faf6f3fa",
-              }}
-            >
-              <View
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "start",
+              gap: Spacing * 3,
+              alignItems: "center",
+              padding: Spacing * 2,
+              marginBottom: Spacing,
+              borderRadius: Spacing,
+              backgroundColor: "#faf6f3fa",
+            }}
+          >
+            <View>
+              <Entypo
+                name="shopping-cart"
+                size={Spacing * 2.4}
+                color="#FFA500"
+              />
+            </View>
+            <View>
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: Spacing,
+                  fontFamily: "outfit-bold",
+                  fontSize: FontSize.medium,
+                  color: "#FFA500",
                 }}
               >
-                <View>
-                  <Text
-                    style={{
-                      fontFamily: "outfit-bold",
-                      fontSize: FontSize.medium,
-                      marginBottom: Spacing,
-                    }}
-                  >
-                    Personal Information
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: "#ffa500",
-                    padding: Spacing * 0.6,
-                    borderRadius: Spacing * 0.6,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      gap: Spacing * 0.4,
-                      alignItems: "center",
-                    }}
-                    onPress={() => {
-                      setIsVisibleEditInfo(false);
-                    }}
-                  >
-                    <MaterialIcons
-                      name="cancel"
-                      size={Spacing * 2}
-                      color="white"
-                    />
-                    <Text style={{ color: "white" }}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View>
-                <Formik
-                  initialValues={{
-                    fullName: userData.user_name || "",
-                    email: userData.email || "",
-                  }}
-                  validationSchema={validationSchema}
-                  onSubmit={(values) => {
-                    handleUpdatePersonalInfor(values);
-                  }}
-                >
-                  {({
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    values,
-                    errors,
-                    touched,
-                  }) => (
-                    <View>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Full name"
-                        onChangeText={handleChange("fullName")}
-                        onBlur={handleBlur("fullName")}
-                        value={values.fullName}
-                      />
-                      <View style={styles.showError}>
-                        {touched.fullName && errors.fullName && (
-                          <Text
-                            style={{
-                              color: "red",
-                              fontFamily: "outfit-medium",
-                              fontSize: FontSize.small,
-                            }}
-                          >
-                            {errors.fullName}
-                          </Text>
-                        )}
-                      </View>
-
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Email"
-                        onChangeText={handleChange("email")}
-                        onBlur={handleBlur("email")}
-                        value={values.email}
-                        keyboardType="email-address"
-                      />
-                      <View style={styles.showError}>
-                        {touched.email && errors.email && (
-                          <Text
-                            style={{
-                              color: "red",
-                              fontFamily: "outfit-medium",
-                              fontSize: FontSize.small,
-                            }}
-                          >
-                            {errors.email}
-                          </Text>
-                        )}
-                      </View>
-
-                      <TouchableOpacity
-                        style={styles.signInButton}
-                        onPress={() => handleSubmit()}
-                      >
-                        <Text style={styles.signInText}>
-                          Update information
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </Formik>
-              </View>
-            </View>
-          ) : (
-            <View
-              style={{
-                width: "100%",
-                padding: Spacing * 2,
-                marginBottom: Spacing,
-                borderRadius: Spacing,
-                backgroundColor: "#faf6f3fa",
-              }}
-            >
-              <View
+                Completed
+              </Text>
+              <Text
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: Spacing,
+                  fontFamily: "outfit-bold",
+                  fontSize: FontSize.medium,
                 }}
               >
-                <View>
-                  <Text
-                    style={{
-                      fontFamily: "outfit-bold",
-                      fontSize: FontSize.medium,
-                      marginBottom: Spacing,
-                    }}
-                  >
-                    Personal Information
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: "#66BB6A",
-                    padding: Spacing * 0.6,
-                    borderRadius: Spacing * 0.6,
-                  }}
-                >
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      gap: Spacing * 0.4,
-                      alignItems: "center",
-                    }}
-                    onPress={() => {
-                      setIsVisibleEditInfo(true);
-                    }}
-                  >
-                    <MaterialIcons
-                      name="edit-note"
-                      size={Spacing * 2}
-                      color="white"
-                    />
-                    <Text style={{ color: "white" }}>Edit</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View>
-                <Text
-                  style={{
-                    fontFamily: "outfit-medium",
-                    fontSize: FontSize.small,
-                    lineHeight: FontSize.small * 1.6,
-                  }}
-                >
-                  Name:{" "}
-                  <Text style={{ fontFamily: "outfit-regular" }}>
-                    nguyenhuudo
-                  </Text>
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "outfit-medium",
-                    fontSize: FontSize.small,
-                    lineHeight: FontSize.small * 1.6,
-                  }}
-                >
-                  Email:{" "}
-                  <Text style={{ fontFamily: "outfit-regular" }}>
-                    nguyenhuudo@gmail.com
-                  </Text>
-                </Text>
-              </View>
+                ({orderStats.completed})
+              </Text>
             </View>
-          )}
+          </View>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "start",
+              gap: Spacing * 3,
+              alignItems: "center",
+              padding: Spacing * 2,
+              marginBottom: Spacing,
+              borderRadius: Spacing,
+              backgroundColor: "#faf6f3fa",
+            }}
+          >
+            <View>
+              <Entypo
+                name="shopping-cart"
+                size={Spacing * 2.4}
+                color="#FFA500"
+              />
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontFamily: "outfit-bold",
+                  fontSize: FontSize.medium,
+                  color: "#FFA500",
+                }}
+              >
+                Cancel
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "outfit-bold",
+                  fontSize: FontSize.medium,
+                }}
+              >
+                ({orderStats.cancelled})
+              </Text>
+            </View>
+          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+        {isVisibleEditInfo ? (
+          <View
+            style={{
+              width: "100%",
+              padding: Spacing * 2,
+              marginBottom: Spacing,
+              borderRadius: Spacing,
+              backgroundColor: "#faf6f3fa",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: Spacing,
+              }}
+            >
+              <View>
+                <Text
+                  style={{
+                    fontFamily: "outfit-bold",
+                    fontSize: FontSize.medium,
+                    marginBottom: Spacing,
+                  }}
+                >
+                  Personal Information
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: "#ffa500",
+                  padding: Spacing * 0.6,
+                  borderRadius: Spacing * 0.6,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flexDirection: "row",
+                    gap: Spacing * 0.4,
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    setIsVisibleEditInfo(false);
+                  }}
+                >
+                  <MaterialIcons
+                    name="cancel"
+                    size={Spacing * 2}
+                    color="white"
+                  />
+                  <Text style={{ color: "white" }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View>
+              <Formik
+                initialValues={{
+                  fullName: userData.user_name || "",
+                  email: userData.email || "",
+                }}
+                validationSchema={validationSchema}
+                onSubmit={(values) => {
+                  handleUpdatePersonalInfor(values);
+                }}
+              >
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                  touched,
+                }) => (
+                  <View>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Full name"
+                      onChangeText={handleChange("fullName")}
+                      onBlur={handleBlur("fullName")}
+                      value={values.fullName}
+                    />
+                    <View style={styles.showError}>
+                      {touched.fullName && errors.fullName && (
+                        <Text
+                          style={{
+                            color: "red",
+                            fontFamily: "outfit-medium",
+                            fontSize: FontSize.small,
+                          }}
+                        >
+                          {errors.fullName}
+                        </Text>
+                      )}
+                    </View>
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Email"
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
+                      value={values.email}
+                      keyboardType="email-address"
+                    />
+                    <View style={styles.showError}>
+                      {touched.email && errors.email && (
+                        <Text
+                          style={{
+                            color: "red",
+                            fontFamily: "outfit-medium",
+                            fontSize: FontSize.small,
+                          }}
+                        >
+                          {errors.email}
+                        </Text>
+                      )}
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.signInButton}
+                      onPress={() => handleSubmit()}
+                    >
+                      <Text style={styles.signInText}>Update information</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </Formik>
+            </View>
+          </View>
+        ) : (
+          <View
+            style={{
+              width: "100%",
+              padding: Spacing * 2,
+              marginBottom: Spacing,
+              borderRadius: Spacing,
+              backgroundColor: "#faf6f3fa",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: Spacing,
+              }}
+            >
+              <View>
+                <Text
+                  style={{
+                    fontFamily: "outfit-bold",
+                    fontSize: FontSize.medium,
+                    marginBottom: Spacing,
+                  }}
+                >
+                  Personal Information
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: "#66BB6A",
+                  padding: Spacing * 0.6,
+                  borderRadius: Spacing * 0.6,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flexDirection: "row",
+                    gap: Spacing * 0.4,
+                    alignItems: "center",
+                  }}
+                  onPress={() => {
+                    setIsVisibleEditInfo(true);
+                  }}
+                >
+                  <MaterialIcons
+                    name="edit-note"
+                    size={Spacing * 2}
+                    color="white"
+                  />
+                  <Text style={{ color: "white" }}>Edit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontFamily: "outfit-medium",
+                  fontSize: FontSize.small,
+                  lineHeight: FontSize.small * 1.6,
+                }}
+              >
+                Name:{" "}
+                <Text style={{ fontFamily: "outfit-regular" }}>
+                  nguyenhuudo
+                </Text>
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "outfit-medium",
+                  fontSize: FontSize.small,
+                  lineHeight: FontSize.small * 1.6,
+                }}
+              >
+                Email:{" "}
+                <Text style={{ fontFamily: "outfit-regular" }}>
+                  nguyenhuudo@gmail.com
+                </Text>
+              </Text>
+            </View>
+          </View>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
   scrollView: {
     backgroundColor: "#fff",
   },

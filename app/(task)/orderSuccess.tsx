@@ -20,112 +20,107 @@ const OrderSuccess = () => {
   const orderId = params.get("orderId");
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={[styles.padding_10, { alignItems: "center" }]}>
-          <View style={{ marginVertical: Spacing * 2 }}>
-            <AntDesign name="checkcircle" size={Spacing * 6} color="green" />
-          </View>
+    <ScrollView style={styles.scrollView}>
+      <View style={[styles.padding_10, { alignItems: "center" }]}>
+        <View style={{ marginVertical: Spacing * 2 }}>
+          <AntDesign name="checkcircle" size={Spacing * 6} color="green" />
+        </View>
+        <Text
+          style={{
+            fontFamily: "outfit-bold",
+            fontSize: FontSize.large,
+            marginBottom: Spacing,
+          }}
+        >
+          Order Placed Successfully!
+        </Text>
+        <View
+          style={{
+            backgroundColor: Colors.primary_10,
+            padding: Spacing * 2,
+            borderRadius: Spacing * 0.8,
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Entypo name="mail" size={Spacing * 2} color={Colors.primary} />
           <Text
             style={{
-              fontFamily: "outfit-bold",
-              fontSize: FontSize.large,
-              marginBottom: Spacing,
+              fontFamily: "outfit-regular",
+              fontSize: FontSize.medium,
+              textAlign: "center",
             }}
           >
-            Order Placed Successfully!
+            We have sent the order confirmation to your email. Please check your
+            inbox for order details.
           </Text>
-          <View
+        </View>
+        <View style={{ marginVertical: Spacing * 2 }}>
+          <Text
             style={{
-              backgroundColor: Colors.primary_10,
-              padding: Spacing * 2,
-              borderRadius: Spacing * 0.8,
-              flexDirection: "column",
-              alignItems: "center",
+              fontFamily: "outfit-medium",
+              fontSize: FontSize.small,
             }}
           >
-            <Entypo name="mail" size={Spacing * 2} color={Colors.primary} />
+            Order ID:{" "}
             <Text
               style={{
                 fontFamily: "outfit-regular",
-                fontSize: FontSize.medium,
-                textAlign: "center",
+                fontSize: FontSize.small,
               }}
             >
-              We have sent the order confirmation to your email. Please check
-              your inbox for order details.
+              {orderId || ""}
             </Text>
-          </View>
-          <View style={{ marginVertical: Spacing * 2 }}>
+          </Text>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: Spacing,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity onPress={() => router.push("../(tabs)/home")}>
             <Text
               style={{
                 fontFamily: "outfit-medium",
                 fontSize: FontSize.small,
+                backgroundColor: Colors.primary,
+                color: Colors.white,
+                padding: Spacing,
+                borderRadius: Spacing * 1.8,
               }}
             >
-              Order ID:{" "}
-              <Text
-                style={{
-                  fontFamily: "outfit-regular",
-                  fontSize: FontSize.small,
-                }}
-              >
-                {orderId || ""}
-              </Text>
+              By More Dishes
             </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: Spacing,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity onPress={() => router.push("../(tabs)/home")}>
-              <Text
-                style={{
-                  fontFamily: "outfit-medium",
-                  fontSize: FontSize.small,
-                  backgroundColor: Colors.primary,
-                  color: Colors.white,
-                  padding: Spacing,
-                  borderRadius: Spacing * 1.8,
-                }}
-              >
-                By More Dishes
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("../(account)/order")}>
-              <Text
-                style={{
-                  fontFamily: "outfit-medium",
-                  fontSize: FontSize.small,
-                  backgroundColor: Colors.primary,
-                  color: Colors.white,
-                  padding: Spacing,
-                  borderRadius: Spacing * 1.8,
-                }}
-              >
-                View Orders
-              </Text>
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("../(account)/order")}>
+            <Text
+              style={{
+                fontFamily: "outfit-medium",
+                fontSize: FontSize.small,
+                backgroundColor: Colors.primary,
+                color: Colors.white,
+                padding: Spacing,
+                borderRadius: Spacing * 1.8,
+              }}
+            >
+              View Orders
+            </Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScrollView>
   );
 };
 
 export default OrderSuccess;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
   scrollView: {
     backgroundColor: "#fff",
+    flex: 1
   },
   padding_10: {
     padding: Spacing,

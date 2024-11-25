@@ -43,7 +43,7 @@ const ItemBox = (props) => {
       {" "}
       {/* Cập nhật thành renderRightActions */}
       <View style={styles.container}>
-        <Text>My name i                              sdgsdgsd gs</Text>
+        <Text>My name i sdgsdgsd gs</Text>
       </View>
     </Swipeable>
   );
@@ -77,6 +77,9 @@ const data = [
   { id: "1", name: "A" },
   { id: "2", name: "B" },
   { id: "3", name: "C" },
+  { id: "11", name: "A" },
+  { id: "23", name: "B" },
+  { id: "34", name: "C" },
 ];
 
 const App = () => {
@@ -89,9 +92,8 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={{ flex: 1 }}>
       <FlatList
-      style={{ flex: 1 }}
         data={lists}
         renderItem={({ item, index }) => {
           return <ItemBox data={item} handleDelete={() => deleteItem(index)} />;
@@ -100,7 +102,7 @@ const App = () => {
           return <View style={styles.seperatorLine}></View>;
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

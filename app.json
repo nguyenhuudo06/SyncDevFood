@@ -22,7 +22,11 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"],
+    "permissions": [
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE",
+      "CAMERA"
+    ],
     "plugins": [
       "expo-router",
       [

@@ -10,6 +10,7 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import BackButton from "@/components/Material/BackButton";
 import { WebView } from "react-native-webview";
@@ -21,7 +22,13 @@ import {
   callGeocoding,
   callProcessPayment,
 } from "@/services/api-call";
-import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import Checkbox from "expo-checkbox";
@@ -29,6 +36,9 @@ import FontSize from "@/constants/FontSize";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import { doClearCartAction } from "@/redux/orderSlice/orderSlice";
+import { setPaymentUrl } from "@/redux/paymentUrlSlice/paymentUrlSlice";
+import HeaderPage from "@/components/HeaderPage/HeaderPage";
+import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
 
 interface Coupon {
   couponId: string;
@@ -102,8 +112,6 @@ export interface OrderInformation {
 
 const Checkout = () => {
   const dispatch = useDispatch();
-  const [showWebView, setShowWebView] = useState(false);
-  const [urlWebView, setUrlWebView] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const userId = useSelector((state: RootState) => state.auth.user_id);
@@ -113,6 +121,11 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "BANKING">("COD");
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
     null
+  );
+  const [bottomModalAndTitle, setBottomModalAndTitle] = useState(false);
+
+  const selectedAddressUi = addresses.find(
+    (item) => item.id === selectedAddress
   );
 
   const checkoutItems = cartItems.map((cart) => ({
@@ -141,9 +154,15 @@ const Checkout = () => {
     userId: userId,
   };
 
-  console.log(orderSummary);
-  console.log(checkoutItems);
-  console.log(orderInformation);
+  const [geocodingCaculater, setGeocodingCaculater] = useState({
+    distance: 0,
+    duration: "0 m",
+  });
+
+  // console.log("selectedAddress: ", addresses);
+  // console.log(orderSummary);
+  // console.log(checkoutItems);
+  // console.log(orderInformation);
 
   const calculateSubtotal = () => {
     return cartItems.reduce(
@@ -154,7 +173,7 @@ const Checkout = () => {
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
     const discount = appliedCoupon ? appliedCoupon.discountAmount : 0;
-    return subtotal - discount;
+    return subtotal - discount + orderSummary.delivery;
   };
 
   const fetchAddresses = async (userId: string | null) => {
@@ -178,6 +197,7 @@ const Checkout = () => {
     fetchAddresses(userId);
   }, [userId]);
 
+  // Tính toán địa lý
   const handleSelectAddress = async (id: string) => {
     const address = addresses.find((address) => address.id === id);
 
@@ -195,14 +215,16 @@ const Checkout = () => {
       .filter(Boolean)
       .join(", ");
 
-    console.log(addressString);
+    // console.log(addressString);
 
     setLoading(true);
 
     try {
       const response = await callGeocoding(addressString);
-      const deliveryData: DeliveryResponse = response.data;
-      console.log(deliveryData);
+      setGeocodingCaculater({
+        distance: response.data.distance,
+        duration: response.data.duration,
+      });
 
       const feeString = response.data.fee;
       const feeAmount = Math.round(
@@ -217,6 +239,7 @@ const Checkout = () => {
           orderSummary.subtotal + feeAmount - (orderSummary.discount || 0)
         ),
       };
+      console.log();
       setOrderSummary(newOrderSummary);
     } catch (error) {
       console.error("Error calling geocoding API", error);
@@ -228,6 +251,12 @@ const Checkout = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Quản lý state
+  const handleAddressSelect = (addressId: string) => {
+    setSelectedAddress(addressId);
+    setBottomModalAndTitle(false);
   };
 
   const handlePayment = async (paymentMethod: "COD" | "BANKING") => {
@@ -254,7 +283,7 @@ const Checkout = () => {
             visibilityTime: 1800,
           });
 
-          console.log(response.data.message);
+          // console.log(response.data.message);
 
           const orderMessage = {
             orderId: response.data.message,
@@ -268,9 +297,10 @@ const Checkout = () => {
           const vnpayRedirectUrl = await callProcessPayment(
             response.data?.message
           );
-          console.log(vnpayRedirectUrl);
-          setUrlWebView(vnpayRedirectUrl);
-          setShowWebView(true);
+          // console.log(vnpayRedirectUrl);
+          dispatch(setPaymentUrl(vnpayRedirectUrl));
+          router.push("../(task)/vpnPayment");
+          dispatch(doClearCartAction());
         }
       } else {
         Toast.show({
@@ -293,179 +323,323 @@ const Checkout = () => {
     }
   };
 
-  const handleAddressSelect = (addressId: string) => {
-    setSelectedAddress(addressId);
-  };
-
   const formatPrice = (price: number) => {
     return Math.round(price).toLocaleString("vi-VN");
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <ScrollView style={styles.scrollView}>
-        {showWebView ? (
-          <WebView source={{ uri: urlWebView }} style={{ flex: 1 }} />
-        ) : (
-          <View>
-            <BackButton />
-            <View style={styles.spacingContainer}>
-              <View>
-                <Text style={styles.titlePage}>Checkout</Text>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => router.push("../(account)/address")}
-                style={{
-                  backgroundColor: Colors.primary_10,
-                  padding: Spacing * 0.4,
-                  paddingHorizontal: Spacing,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: Spacing * 0.8,
-                  marginBottom: Spacing,
-                }}
+        <HeaderPage titlePage="Checkout" />
+        <View>
+          <View style={styles.spacingContainer}>
+            <View style={{ padding: Spacing }}>
+              <Text
+                style={{ fontFamily: "outfit-medium", marginBottom: Spacing }}
               >
-                <AntDesign
-                  name="plus"
-                  size={FontSize.small}
+                Delivery address
+              </Text>
+              {addresses.length == 0 ? (
+                <TouchableOpacity
+                  onPress={() => router.push("../(account)/address")}
+                  style={{
+                    backgroundColor: Colors.primary_10,
+                    padding: Spacing * 0.4,
+                    paddingHorizontal: Spacing,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: Spacing * 0.8,
+                    marginBottom: Spacing,
+                  }}
+                >
+                  <AntDesign
+                    name="plus"
+                    size={FontSize.small}
+                    color={Colors.primary}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "outfit-medium",
+                      marginLeft: Spacing * 0.8,
+                    }}
+                  >
+                    Create new address
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => setBottomModalAndTitle(true)}
+                  style={[
+                    styles.flexEnd,
+                    styles.dropShadow,
+                    {
+                      padding: Spacing,
+                      borderRadius: Spacing * 0.8,
+                    },
+                  ]}
+                >
+                  <AntDesign name="arrowright" size={24} color="black" />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {selectedAddressUi && (
+              <View style={{ padding: Spacing }}>
+                <Text style={styles.regularText}>
+                  {selectedAddressUi.phoneNumber}
+                </Text>
+                <Text style={styles.regularText}>
+                  {selectedAddressUi?.street}
+                </Text>
+                <Text style={styles.regularText}>
+                  {selectedAddressUi?.commune}, {selectedAddressUi?.state},{" "}
+                  {selectedAddressUi?.city}, {selectedAddressUi?.country}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View
+            style={[
+              styles.spacingContainer,
+              { paddingHorizontal: Spacing * 2 },
+            ]}
+          >
+            <Text style={{ fontFamily: "outfit-medium" }}>Payment method</Text>
+            <TouchableOpacity
+              onPress={() => setPaymentMethod("COD")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: Spacing,
+              }}
+            >
+              {paymentMethod == "COD" ? (
+                <MaterialIcons
+                  name="radio-button-checked"
+                  size={Spacing * 2}
                   color={Colors.primary}
                 />
-                <Text
-                  style={{
-                    fontFamily: "outfit-medium",
-                    marginLeft: Spacing * 0.8,
-                  }}
-                >
-                  Create new address
-                </Text>
-              </TouchableOpacity>
-
-              {addresses.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={async () => {
-                    await handleAddressSelect(item.id);
-                    await handleSelectAddress(item.id);
-                  }}
-                >
-                  <View style={styles.addressContainer}>
-                    <View style={styles.addressHeader}>
-                      <Checkbox
-                        value={selectedAddress === item.id}
-                        // onValueChange={() => handleAddressSelect(item.id)}
-                      />
-                      <View style={styles.addressTypeContainer}>
-                        <FontAwesome name="home" size={14} color="#3498db" />
-                        <Text style={styles.addressTypeText}>
-                          {item?.addressType.toUpperCase()}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.addressDetailsContainer}>
-                      <View style={{ flex: 1 }}>
-                        <Text numberOfLines={1} style={styles.userText}>
-                          {userName}{" "}
-                          <Text style={styles.phoneText}>
-                            ( {item?.phoneNumber} )
-                          </Text>
-                        </Text>
-                        <Text numberOfLines={1} style={styles.streetText}>
-                          <Text style={styles.regularText}>{item?.street}</Text>
-                        </Text>
-                        <Text numberOfLines={2} style={styles.cityText}>
-                          <Text style={styles.regularText}>
-                            {item?.commune}, {item?.state}, {item?.city},{" "}
-                            {item?.country}
-                          </Text>
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View
-              style={[
-                styles.spacingContainer,
-                { paddingHorizontal: Spacing * 2 },
-              ]}
-            >
-              <Text style={{ fontFamily: "outfit-medium" }}>
-                Payment method
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={Spacing * 2}
+                  color={Colors.gray}
+                />
+              )}
+              <Text
+                style={{ marginLeft: Spacing, fontFamily: "outfit-regular" }}
+              >
+                Cash on delivery
               </Text>
-              <TouchableOpacity
-                onPress={() => setPaymentMethod("COD")}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: Spacing,
-                }}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setPaymentMethod("BANKING")}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: Spacing,
+              }}
+            >
+              {paymentMethod == "BANKING" ? (
+                <MaterialIcons
+                  name="radio-button-checked"
+                  size={Spacing * 2}
+                  color={Colors.primary}
+                />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={Spacing * 2}
+                  color={Colors.gray}
+                />
+              )}
+              <Text
+                style={{ marginLeft: Spacing, fontFamily: "outfit-regular" }}
               >
-                {paymentMethod == "COD" ? (
-                  <MaterialIcons
-                    name="radio-button-checked"
-                    size={Spacing * 2}
-                    color={Colors.primary}
-                  />
-                ) : (
-                  <MaterialIcons
-                    name="radio-button-unchecked"
-                    size={Spacing * 2}
-                    color={Colors.gray}
-                  />
-                )}
-                <Text
-                  style={{ marginLeft: Spacing, fontFamily: "outfit-regular" }}
-                >
-                  Cash on delivery
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setPaymentMethod("BANKING")}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: Spacing,
-                }}
-              >
-                {paymentMethod == "BANKING" ? (
-                  <MaterialIcons
-                    name="radio-button-checked"
-                    size={Spacing * 2}
-                    color={Colors.primary}
-                  />
-                ) : (
-                  <MaterialIcons
-                    name="radio-button-unchecked"
-                    size={Spacing * 2}
-                    color={Colors.gray}
-                  />
-                )}
-                <Text
-                  style={{ marginLeft: Spacing, fontFamily: "outfit-regular" }}
-                >
-                  VNPay
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.spacingContainer}>
+                VNPay
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.spacingContainer}>
+            <View
+              style={{
+                padding: Spacing,
+                paddingTop: Spacing * 1.6,
+                borderRadius: Spacing * 0.8,
+                backgroundColor: Colors.white,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.2,
+                shadowRadius: 12,
+                elevation: 5,
+              }}
+            >
               <View
                 style={{
-                  padding: Spacing,
-                  paddingTop: Spacing * 1.6,
-                  borderRadius: Spacing * 0.8,
-                  backgroundColor: Colors.white,
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 12,
-                  elevation: 5,
+                  paddingVertical: Spacing * 0.4,
                 }}
               >
+                <Text
+                  style={{
+                    fontSize: FontSize.small,
+                    fontFamily: "outfit-bold",
+                    marginBottom: Spacing,
+                  }}
+                >
+                  Total Cart
+                </Text>
                 <View
                   style={{
-                    paddingVertical: Spacing * 0.4,
+                    borderColor: Colors.gray,
+                    borderWidth: 1,
+                    marginBottom: Spacing,
+                  }}
+                />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    Sub-Total:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    {formatPrice(calculateSubtotal())} VND
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    Distance:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    {geocodingCaculater.distance}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    Duration (About):
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    {geocodingCaculater.duration}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    Delivery:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    {formatPrice(orderSummary.delivery)} VND
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    Discount:
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-regular",
+                      marginBottom: Spacing,
+                    }}
+                  >
+                    {appliedCoupon
+                      ? formatPrice(appliedCoupon.discountAmount)
+                      : 0}{" "}
+                    VND
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    borderColor: Colors.gray,
+                    borderWidth: 1,
+                    marginBottom: Spacing,
+                  }}
+                />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
                   <Text
@@ -475,206 +649,123 @@ const Checkout = () => {
                       marginBottom: Spacing,
                     }}
                   >
-                    Total Cart
+                    Total
                   </Text>
-                  <View
+                  <Text
                     style={{
-                      borderColor: Colors.gray,
-                      borderWidth: 1,
+                      fontSize: FontSize.small,
+                      fontFamily: "outfit-bold",
                       marginBottom: Spacing,
                     }}
-                  />
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
                   >
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      Sub-Total:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      {formatPrice(calculateSubtotal())} VND
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      Distance:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      0 VND
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      Duration (About):
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      0 VND
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      Delivery:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      0 VND
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      Discount:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-regular",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      {appliedCoupon
-                        ? formatPrice(appliedCoupon.discountAmount)
-                        : 0}{" "}
-                      VND
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      borderColor: Colors.gray,
-                      borderWidth: 1,
-                      marginBottom: Spacing,
-                    }}
-                  />
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-bold",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      Total
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: FontSize.small,
-                        fontFamily: "outfit-bold",
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      {formatPrice(calculateTotal())} VND
-                    </Text>
-                  </View>
+                    {formatPrice(calculateTotal())} VND
+                  </Text>
                 </View>
-
-                <TouchableOpacity
-                  style={styles.signInButton}
-                  onPress={() => handlePayment(paymentMethod)}
-                >
-                  <Text style={styles.signInText}>Place Orlder</Text>
-                </TouchableOpacity>
               </View>
+
+              <TouchableOpacity
+                style={styles.signInButton}
+                onPress={() => handlePayment(paymentMethod)}
+              >
+                <Text style={styles.signInText}>Place Orlder</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        )}
+        </View>
       </ScrollView>
+
       <Modal transparent visible={loading}>
         <View style={styles.overlay}>
           <ActivityIndicator size="large" color="#fff" />
         </View>
       </Modal>
-    </SafeAreaView>
+
+      <BottomModal
+        visible={bottomModalAndTitle}
+        onTouchOutside={() => setBottomModalAndTitle(false)}
+        overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
+        height={0.6}
+        width={1}
+        onSwipeOut={() => setBottomModalAndTitle(false)}
+      >
+        <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
+          <FlatList
+            data={addresses}
+            keyExtractor={(item) => item.id.toString()} // Đảm bảo rằng 'id' là duy nhất và là kiểu dữ liệu chuỗi
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={async () => {
+                  await handleAddressSelect(item.id);
+                  await handleSelectAddress(item.id);
+                }}
+              >
+                <View style={styles.addressContainer}>
+                  <View style={styles.addressHeader}>
+                    <Checkbox
+                      value={selectedAddress === item.id}
+                      onValueChange={async () => {
+                        await handleAddressSelect(item.id);
+                        await handleSelectAddress(item.id);
+                      }}
+                    />
+                    <View style={styles.addressTypeContainer}>
+                      <FontAwesome name="home" size={14} color="#3498db" />
+                      <Text style={styles.addressTypeText}>
+                        {item?.addressType.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.addressDetailsContainer}>
+                    <View style={{ flex: 1 }}>
+                      <Text numberOfLines={1} style={styles.userText}>
+                        {userName}{" "}
+                        <Text style={styles.phoneText}>
+                          ( {item?.phoneNumber} )
+                        </Text>
+                      </Text>
+                      <Text numberOfLines={1} style={styles.streetText}>
+                        <Text style={styles.regularText}>{item?.street}</Text>
+                      </Text>
+                      <Text numberOfLines={2} style={styles.cityText}>
+                        <Text style={styles.regularText}>
+                          {item?.commune}, {item?.state}, {item?.city},{" "}
+                          {item?.country}
+                        </Text>
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </ModalContent>
+      </BottomModal>
+    </>
   );
 };
 
 export default Checkout;
 
 const styles = StyleSheet.create({
+  dropShadow: {
+    borderRadius: Spacing * 0.8,
+    backgroundColor: Colors.white,
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  flexStart: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  flexEnd: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
   container: {
     flex: 1,
     paddingTop: StatusBar.currentHeight,

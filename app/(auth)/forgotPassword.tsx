@@ -34,8 +34,13 @@ const ForgotPassword = () => {
     try {
       const responseForgotPassword = await callForgotPassword(email);
 
-      if (responseForgotPassword.status < 200 || responseForgotPassword.status >= 300) {
-        throw new Error("Request failed with status " + responseForgotPassword.status);
+      if (
+        responseForgotPassword.status < 200 ||
+        responseForgotPassword.status >= 300
+      ) {
+        throw new Error(
+          "Request failed with status " + responseForgotPassword.status
+        );
       }
 
       Toast.show({
@@ -90,29 +95,29 @@ const ForgotPassword = () => {
               }) => (
                 <>
                   <View style={styles.inputContainer}>
-                    <TextInput
-                      placeholder="Email"
-                      placeholderTextColor={Colors.darkText}
-                      style={styles.input}
-                      onChangeText={(text) =>
-                        handleChange("email")(text.trim())
-                      }
-                      onBlur={handleBlur("email")}
-                      value={values.email}
-                    />
-                    <View style={styles.showError}>
-                      {touched.email && errors.email && (
-                        <Text style={styles.errorText}>{errors.email}</Text>
-                      )}
+                    <View>
+                      <TextInput
+                        placeholder="Email"
+                        placeholderTextColor={Colors.darkText}
+                        style={styles.input}
+                        onChangeText={(text) =>
+                          handleChange("email")(text.trim())
+                        }
+                        onBlur={handleBlur("email")}
+                        value={values.email}
+                      />
+                      <View style={styles.showError}>
+                        {touched.email && errors.email && (
+                          <Text style={styles.errorText}>{errors.email}</Text>
+                        )}
+                      </View>
                     </View>
                   </View>
                   <TouchableOpacity
                     style={styles.sendButton}
                     onPress={() => handleSubmit()}
                   >
-                    <Text style={styles.buttonText}>
-                      Send verify email
-                    </Text>
+                    <Text style={styles.buttonText}>Send verify email</Text>
                   </TouchableOpacity>
                 </>
               )}

@@ -14,7 +14,7 @@ export default {
   background: white,
   primary: "#81C784",
   primary_10: "#81C7841A",
-  primary_20: "#81C7848A",
+  primary_20: "#81C7842A",
   orange: orange,
   onPrimary: white,
   active: blue,

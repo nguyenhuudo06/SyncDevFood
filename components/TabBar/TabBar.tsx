@@ -9,7 +9,7 @@ import { RootState } from "@/redux/store";
 
 const TabBar = ({ state, descriptors, navigation }) => {
   const primaryColor = Colors.primary;
-  const grayColor = Colors.primary_20;
+  const grayColor = Colors.gray;
   const focusBg = Colors.primary_10;
   const cartCount = useSelector(
     (state: RootState) => state.order.carts.length || 0
@@ -25,12 +25,12 @@ const TabBar = ({ state, descriptors, navigation }) => {
     search: (props: any) => (
       <FontAwesome name="search" size={24} color={grayColor} {...props} />
     ),
-    cart: (props: any) => (
+    cart2: (props: any) => (
+      // <Entypo name="shopping-cart" size={24} color={grayColor} {...props} />
       <View>
         <Entypo name="shopping-cart" size={24} color={grayColor} {...props} />
-        <Text
+        <View
           style={{
-            color: "white",
             position: "absolute",
             top: -6,
             right: -10,
@@ -41,11 +41,17 @@ const TabBar = ({ state, descriptors, navigation }) => {
             justifyContent: "center",
             alignItems: "center",
             borderRadius: Spacing * 2,
-            fontFamily: "outfit-regular",
           }}
         >
-          {cartCount}
-        </Text>
+          <Text
+            style={{
+              color: "white",
+              fontFamily: "outfit-regular",
+            }}
+          >
+            {cartCount}
+          </Text>
+        </View>
       </View>
     ),
     profile: (props: any) => (

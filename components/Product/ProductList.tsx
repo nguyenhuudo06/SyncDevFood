@@ -75,17 +75,8 @@ const ProductList = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // const renderCountRef = useRef(0);
-  // renderCountRef.current += 1;
-  // console.log("Render: ", renderCountRef);
-
   const handleGetProductLists = async (page: number) => {
     setLoading(true);
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(1);
-      }, 3000);
-    });
 
     try {
       const responseGetProductLists = await callAllProduct(page);
@@ -127,157 +118,142 @@ const ProductList = () => {
   };
 
   return (
-    <ScrollView style={styles.scrollView}>
-      <View style={{ padding: Spacing }}>
-        <CustomLayoutContainer style={styles}>
-          <CustomLayoutRow style={{ marginBottom: Spacing }}>
-            <FlatList
-              data={productList}
-              numColumns={columnSize}
-              renderItem={({ item }) => (
-                <CustomLayoutCol
-                  key={item.dishId}
-                  size={columnSize}
-                  style={styles}
+    <CustomLayoutContainer style={{}}>
+      <CustomLayoutRow style={{ marginBottom: Spacing }}>
+        <FlatList
+          data={productList}
+          numColumns={columnSize}
+          nestedScrollEnabled
+          renderItem={({ item }) => (
+            <CustomLayoutCol key={item.dishId} size={columnSize} style={styles}>
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() =>
+                  router.push(`../(product)/product/${item?.dishId}`)
+                }
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: Spacing * 0.4,
+                    marginBottom: Spacing * 0.8,
+                  }}
                 >
-                  <TouchableOpacity
-                    style={styles.item}
-                    onPress={() =>
-                      router.push(`../(product)/product/${item?.dishId}`)
-                    }
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: Spacing * 0.4,
-                        marginBottom: Spacing * 0.8,
-                      }}
-                    >
-                      <Entypo
-                        name="star"
-                        size={FontSize.medium}
-                        color="orange"
-                      />
-                      <Text
-                        style={{
-                          fontSize: FontSize.xsmall,
-                          lineHeight: FontSize.xsmall * 1.2,
-                          fontFamily: "outfit-bold",
-                        }}
-                      >
-                        {item?.rating ?? "No ratings"}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        overflow: "hidden",
-                        borderRadius: Spacing,
-                        marginBottom: Spacing,
-                      }}
-                    >
-                      <Image
-                        source={{ uri: item?.thumbImage }}
-                        resizeMode="cover"
-                        style={{ width: "100%", height: 80 }}
-                      />
-                    </View>
-                    <View style={{}}>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          fontFamily: "outfit-medium",
-                          fontSize: FontSize.medium,
-                          lineHeight: FontSize.medium * 1.2,
-                          minHeight: 2 * (FontSize.medium * 1.2),
-                        }}
-                      >
-                        {item?.dishName}
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          fontFamily: "outfit-bold",
-                          color: Colors.description,
-                          opacity: 0.5,
-                          fontSize: FontSize.xsmall,
-                          // lineHeight: FontSize.xsmall * 1.2,
-                          // minHeight: 2 * (FontSize.xsmall * 1.2),
-                        }}
-                      >
-                        {item?.categoryName}
-                      </Text>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: "outfit-bold",
-                            color: Colors.orange,
-                            fontSize: FontSize.small,
-                          }}
-                        >
-                          VND
-                        </Text>
-                        <View>
-                          <AntDesign
-                            name="pluscircle"
-                            size={30}
-                            color={Colors.orange}
-                          />
-                        </View>
-                      </View>
-                      <View>
-                        <Text
-                          style={{
-                            width: "100%",
-                            fontFamily: "outfit-bold",
-                            color: Colors.orange,
-                            fontSize: FontSize.small,
-                            paddingTop: Spacing * 0.4,
-                          }}
-                        >
-                          {formatCurrency(100000000.99)}
-                        </Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </CustomLayoutCol>
-              )}
-              keyExtractor={(item) => item.dishId.toString()}
-              onEndReached={loadMoreFc}
-              onEndReachedThreshold={0.5}
-              ListFooterComponent={() => (
-                <View style={{ padding: Spacing, alignItems: "center" }}>
+                  <Entypo name="star" size={FontSize.medium} color="orange" />
                   <Text
-                    style={{ fontFamily: "outfit-medium", color: Colors.gray }}
+                    style={{
+                      fontSize: FontSize.xsmall,
+                      lineHeight: FontSize.xsmall * 1.2,
+                      fontFamily: "outfit-bold",
+                    }}
                   >
-                    End of List
+                    {item?.rating ?? "No ratings"}
                   </Text>
-                  {loading && (
-                    <ActivityIndicator size="large" color="#00ff00" />
-                  )}
                 </View>
-              )}
-            />
-          </CustomLayoutRow>
-        </CustomLayoutContainer>
-      </View>
-    </ScrollView>
+                <View
+                  style={{
+                    justifyContent: "center",
+                    overflow: "hidden",
+                    borderRadius: Spacing,
+                    marginBottom: Spacing,
+                  }}
+                >
+                  <Image
+                    source={{ uri: item?.thumbImage }}
+                    resizeMode="cover"
+                    style={{ width: "100%", height: 80 }}
+                  />
+                </View>
+                <View style={{}}>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      fontFamily: "outfit-medium",
+                      fontSize: FontSize.medium,
+                      lineHeight: FontSize.medium * 1.2,
+                      minHeight: 2 * (FontSize.medium * 1.2),
+                    }}
+                  >
+                    {item?.dishName}
+                  </Text>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      fontFamily: "outfit-bold",
+                      color: Colors.description,
+                      opacity: 0.5,
+                      fontSize: FontSize.xsmall,
+                      // lineHeight: FontSize.xsmall * 1.2,
+                      // minHeight: 2 * (FontSize.xsmall * 1.2),
+                    }}
+                  >
+                    {item?.categoryName}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "outfit-bold",
+                        color: Colors.orange,
+                        fontSize: FontSize.small,
+                      }}
+                    >
+                      VND
+                    </Text>
+                    <View>
+                      <AntDesign
+                        name="pluscircle"
+                        size={30}
+                        color={Colors.orange}
+                      />
+                    </View>
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        width: "100%",
+                        fontFamily: "outfit-bold",
+                        color: Colors.orange,
+                        fontSize: FontSize.small,
+                        paddingTop: Spacing * 0.4,
+                      }}
+                    >
+                      {formatCurrency(100000000.99)}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </CustomLayoutCol>
+          )}
+          keyExtractor={(item) => item.dishId.toString()}
+          onEndReached={loadMoreFc}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={() => (
+            <View style={{ padding: Spacing, alignItems: "center" }}>
+              <Text style={{ fontFamily: "outfit-medium", color: Colors.gray }}>
+                End of List
+              </Text>
+              {loading && <ActivityIndicator size="large" color="#00ff00" />}
+            </View>
+          )}
+        />
+      </CustomLayoutRow>
+    </CustomLayoutContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    marginBottom: 80,
-  },
   "custom-layout-container": {
     width: "100%",
+    marginBottom: 80,
+    maxHeight: Dimensions.get("window").height,
+    padding: Spacing,
   },
   "custom-layout-row": {
     flexDirection: "row",

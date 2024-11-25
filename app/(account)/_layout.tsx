@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Stack} from "expo-router";
+import { Stack } from "expo-router";
 import ProtectedRoute from "@/components/Protected/ProtectedRoute";
 
 const AccountLayout = () => {
@@ -12,6 +12,7 @@ const AccountLayout = () => {
         <Stack.Screen name="reviews" options={{ headerShown: false }} />
         <Stack.Screen name="wishlist" options={{ headerShown: false }} />
         <Stack.Screen name="changePassword" options={{ headerShown: false }} />
+        <Stack.Screen name="avatarConfig" options={{ headerShown: false }} />
       </Stack>
     </ProtectedRoute>
   );

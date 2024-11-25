@@ -14,6 +14,8 @@ import {
 } from "react-native";
 import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
 import * as ImagePicker from "expo-image-picker";
+import WebView from "react-native-webview";
+import ImageWithFallback from "@/components/Image/ImageWithFallback";
 
 const styles = StyleSheet.create({
   container: {},
@@ -49,27 +51,17 @@ const Test = () => {
         <Button title="Bottom" onPress={() => setBottomModalAndTitle(true)} />
       </View>
 
-      <View
-        style={{
-          width: 100,
-          height: 100,
-          borderRadius: 100,
-          overflow: "hidden",
-          borderWidth: 1,
-          borderColor: Colors.gray,
-          margin: Spacing,
-        }}
-      >
-        <Image
-          style={{ width: "100%", height: "100%" }}
-          source={
-            imageError
-              ? require("../../assets/images/avatart-template.jpg") // Đường dẫn đến ảnh mặc định
-              : {
-                  uri: "https://images.vexels.com/content/145908/preview/male-avatar-maker-2a7919.png",
-                }
-          }
-          onError={() => setImageError(true)}
+      <View style={{ backgroundColor: "red" }}>
+        <ImageWithFallback
+          source={{ uri: "https://example.com/invalid-image.jpg" }}
+          fallbackSource={require("../../assets/images/pngegg.png")}
+          style={{
+            width: 150,
+            height: 150,
+            backgroundColor: "blue",
+            borderRadius: Spacing * 1.6,
+          }}
+          resizeMode="cover"
         />
       </View>
 

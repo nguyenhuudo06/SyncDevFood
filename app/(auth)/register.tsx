@@ -177,44 +177,24 @@ const Register = () => {
                     )}
                   </Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => router.replace("./login")}
-                  style={styles.createAccountButton}
-                >
-                  <Text style={styles.createAccountText}>
-                    Already have an account?
-                  </Text>
-                </TouchableOpacity>
               </>
             )}
           </Formik>
 
-          <View style={styles.paddingView}>
-            <Text style={styles.continueText}>Or continue with</Text>
-            <View style={styles.socialButtonsContainer}>
-              <TouchableOpacity style={styles.socialButton}>
-                <Ionicons
-                  name="logo-google"
-                  color={Colors.text}
-                  size={Spacing * 2}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <FontAwesome
-                  name="facebook"
-                  color={Colors.text}
-                  size={Spacing * 2}
-                />
-              </TouchableOpacity>
-            </View>
+          <View style={{ flexDirection: "row", justifyContent : "space-between", alignItems: "center" }}>
+            <TouchableOpacity
+              onPress={() => router.replace("./login")}
+              style={styles.createAccountButton}
+            >
+              <Text style={[styles.createAccountText, {color: Colors.primary}]}>Sign in</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.replace("../(tabs)/home")}
+              style={styles.createAccountButton}
+            >
+              <Text style={[styles.createAccountText, {color: Colors.primary}]}>Home page</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => router.replace("../(tabs)/home")}
-            style={styles.createAccountButton}
-          >
-            <Text style={styles.createAccountText}>Go to home page</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -15,18 +15,30 @@ const ImgSelect = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   // Hàm yêu cầu quyền truy cập
+  // const requestPermission = async () => {
+  //   if (Platform.OS !== "web") {
+  //     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //     if (status !== "granted") {
+  //       Alert.alert(
+  //         "Quyền truy cập bị từ chối",
+  //         "Ứng dụng cần quyền truy cập thư viện ảnh để hoạt động."
+  //       );
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
+
   const requestPermission = async () => {
-    if (Platform.OS !== "web") {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Quyền truy cập bị từ chối",
-          "Ứng dụng cần quyền truy cập thư viện ảnh để hoạt động."
-        );
-        return false;
-      }
+    // Yêu cầu quyền truy cập thư viện ảnh
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert("Access denied!");
+      return false; // Trả về false nếu không có quyền truy cập
     }
-    return true;
+
+    return true; // Trả về true nếu đã có quyền truy cập
   };
 
   // Mở thư viện ảnh
@@ -37,7 +49,7 @@ const ImgSelect = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true, // Cho phép chỉnh sửa ảnh
-      aspect: [4, 3], // Tỉ lệ chỉnh sửa (nếu cần)
+      aspect: [3, 3], // Tỉ lệ chỉnh sửa (nếu cần)
       quality: 1, // Chất lượng ảnh (1 là cao nhất)
     });
 

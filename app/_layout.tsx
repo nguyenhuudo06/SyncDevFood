@@ -169,6 +169,18 @@ export default function RootLayout() {
                 name="(product)/product/[productId]"
                 options={{ headerShown: false }}
               />
+
+              <Stack.Screen
+                name="(blog)/blogId/[blogId]"
+                options={{ headerShown: false }}
+              />
+
+              <Stack.Screen
+                name="(blog)/blogList"
+                options={{ headerShown: false }}
+              />
+
+              <Stack.Screen name="(order)" options={{ headerShown: false }} />
             </Stack>
             <ModalPortal />
             <Toast config={toastConfig} />
@@ -182,6 +194,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: StatusBar.currentHeight,
+    // paddingTop: StatusBar.currentHeight,
   },
 });

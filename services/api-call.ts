@@ -1,5 +1,6 @@
 import { OrderInformation } from "@/app/(task)/checkout";
 import instance from "@/utils/axios-instance";
+import axios from "axios";
 import { router } from "expo-router";
 
 export const callRegister = (
@@ -51,7 +52,7 @@ export const callDeleteAddress = (addressId: string) => {
 
 export const callAllProduct = async (pageNumber: number) => {
   return instance.get(
-    `/api/v1/auth/guest/get-all-dishes?pageNo=${pageNumber}&pageSize=6&sortBy=dishName&sortDir=asc`
+    `/api/v1/auth/guest/get-all-dishes?pageNo=${pageNumber}&pageSize=8&sortBy=dishName&sortDir=asc`
   );
 };
 
@@ -140,7 +141,68 @@ export const callChangePassword = (
   });
 };
 
-
 export const callGetOrderById = async (userId: string, query: string) => {
-  return instance.get(`/api/v1/client/order/get-order-by-user-id?userId=${userId}&${query}`);
+  return instance.get(
+    `/api/v1/client/order/get-order-by-user-id?userId=${userId}&${query}`
+  );
+};
+
+export const callGetWishListById = async (userId: string) => {
+  return instance.get(
+    `/api/v1/client/wishlist/get-wishlist-by-user-id?userId=${userId}`
+  );
+};
+
+export const callProvincialService = async () => {
+  return axios.get("https://api.mysupership.vn/v1/partner/areas/province");
+};
+
+export const callDistrictService = async (code: string) => {
+  return axios.get(
+    `https://api.mysupership.vn/v1/partner/areas/district?province=${code}`
+  );
+};
+
+export const callCommuneService = async (code: string) => {
+  return axios.get(
+    `https://api.mysupership.vn/v1/partner/areas/commune?district=${code}`
+  );
+};
+
+export const callAddAddress = (
+  street: string,
+  country: string,
+  city: string,
+  addressType: string,
+  state: string,
+  commune: string,
+  phoneNumber: string,
+  userId: string | null
+) => {
+  return instance.post("/api/v1/client/address/add", {
+    street,
+    country,
+    city,
+    addressType,
+    state,
+    commune,
+    phoneNumber,
+    userId,
+  });
+};
+
+export const callGetAllOffers = async () => {
+  return instance.get(`/api/v1/auth/guest/get-all-offers`);
+};
+
+export const callGetBlogs = async (query: string) => {
+  return instance.get(`/api/v1/auth/guest/get-all-blogs?${query}`);
+};
+
+export const callUpdateAvatar = (file: FormData) => {
+  return instance.put("/api/v1/client/user/update-avatar", file, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };

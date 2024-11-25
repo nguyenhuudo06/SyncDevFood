@@ -85,125 +85,127 @@ const Login = () => {
 
   return (
     <>
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <View style={styles.paddingView}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleText}>Syndev Food</Text>
-              <Text style={styles.welcomeText}>
-                Welcome back you've been missed!
-              </Text>
-            </View>
-            <Formik
-              initialValues={{ email: "", password: "" }}
-              validationSchema={validationSchema}
-              onSubmit={async (values) => {
-                await handleLogin(values.email, values.password);
-              }}
-            >
-              {({
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                values,
-                errors,
-                touched,
-              }) => (
-                <>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      placeholder="Email"
-                      placeholderTextColor={Colors.darkText}
-                      style={styles.input}
-                      onChangeText={(text) =>
-                        handleChange("email")(text.trim())
-                      }
-                      onBlur={handleBlur("email")}
-                      value={values.email}
-                    />
-                    <View style={styles.showError}>
-                      {touched.email && errors.email && (
-                        <Text style={{ color: "red" }}>{errors.email}</Text>
-                      )}
-                    </View>
-
-                    <TextInput
-                      placeholder="Password"
-                      placeholderTextColor={Colors.darkText}
-                      secureTextEntry
-                      style={styles.input}
-                      onChangeText={(text) =>
-                        handleChange("password")(text.trim())
-                      }
-                      onBlur={handleBlur("password")}
-                      value={values.password}
-                    />
-                    <View style={styles.showError}>
-                      {touched.password && errors.password && (
-                        <Text style={{ color: "red" }}>{errors.password}</Text>
-                      )}
-                    </View>
-                  </View>
-
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.paddingView}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>Syndev Food</Text>
+            <Text style={styles.welcomeText}>
+              Welcome back you've been missed!
+            </Text>
+          </View>
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={async (values) => {
+              await handleLogin(values.email, values.password);
+            }}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+            }) => (
+              <>
+                <View>
                   <View>
-                    <TouchableOpacity
-                      onPress={() => router.push("./forgotPassword")}
-                    >
-                      <Text style={styles.forgotPasswordText}>
-                        Forgot your password?
-                      </Text>
-                    </TouchableOpacity>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        placeholder="Email"
+                        placeholderTextColor={Colors.darkText}
+                        style={styles.input}
+                        onChangeText={(text) =>
+                          handleChange("email")(text.trim())
+                        }
+                        onBlur={handleBlur("email")}
+                        value={values.email}
+                      />
+                      <View style={styles.showError}>
+                        {touched.email && errors.email && (
+                          <Text style={{ color: "red" }}>{errors.email}</Text>
+                        )}
+                      </View>
+
+                      <TextInput
+                        placeholder="Password"
+                        placeholderTextColor={Colors.darkText}
+                        secureTextEntry
+                        style={styles.input}
+                        onChangeText={(text) =>
+                          handleChange("password")(text.trim())
+                        }
+                        onBlur={handleBlur("password")}
+                        value={values.password}
+                      />
+                      <View style={styles.showError}>
+                        {touched.password && errors.password && (
+                          <Text style={{ color: "red" }}>
+                            {errors.password}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
                   </View>
+                </View>
+
+                <View>
                   <TouchableOpacity
-                    style={styles.signInButton}
-                    onPress={() => handleSubmit()}
+                    onPress={() => router.push("./forgotPassword")}
                   >
-                    <Text style={styles.signInText}>
-                      {loading ? (
-                        <ActivityIndicator size="small" color="#fff" />
-                      ) : (
-                        " Sign in"
-                      )}
+                    <Text style={styles.forgotPasswordText}>
+                      Forgot your password?
                     </Text>
                   </TouchableOpacity>
-                </>
-              )}
-            </Formik>
+                </View>
+                <TouchableOpacity
+                  style={styles.signInButton}
+                  onPress={() => handleSubmit()}
+                >
+                  <Text style={styles.signInText}>
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      " Sign in"
+                    )}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </Formik>
 
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <TouchableOpacity
               onPress={() => router.replace("./register")}
               style={styles.createAccountButton}
             >
-              <Text style={styles.createAccountText}>Create new account</Text>
+              <Text
+                style={[styles.createAccountText, { color: Colors.primary }]}
+              >
+                Register
+              </Text>
             </TouchableOpacity>
-            <View style={styles.paddingView}>
-              <Text style={styles.continueText}>Or continue with</Text>
-              <View style={styles.socialButtonsContainer}>
-                <TouchableOpacity style={styles.socialButton}>
-                  <Ionicons
-                    name="logo-google"
-                    color={Colors.text}
-                    size={Spacing * 2}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.socialButton}>
-                  <FontAwesome
-                    name="facebook"
-                    color={Colors.text}
-                    size={Spacing * 2}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+
             <TouchableOpacity
               onPress={() => router.replace("../(tabs)/home")}
               style={styles.createAccountButton}
             >
-              <Text style={styles.createAccountText}>Go to home page</Text>
+              <Text
+                style={[styles.createAccountText, { color: Colors.primary }]}
+              >
+                Home page
+              </Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </SafeAreaView>
+        </View>
+      </ScrollView>
     </>
   );
 };
@@ -211,10 +213,6 @@ const Login = () => {
 export default Login;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
   scrollView: {
     flexGrow: 1,
     backgroundColor: "#fff",

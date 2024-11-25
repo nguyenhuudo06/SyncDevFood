@@ -12,7 +12,11 @@ import { TouchableOpacity, TextInput } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import Carousel from "pinar";
 import Spacing from "@/constants/Spacing";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import FontSize from "@/constants/FontSize";
 import { router } from "expo-router";
@@ -69,16 +73,32 @@ const ProductDetails = () => {
 
   const [dishDetail, setDishDetail] = useState<DishDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentQuantity, setCurrentQuantity] = useState(1);
+  const [currentQuantity, setCurrentQuantity] = useState<string>("1");
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: { name: string; price: number; optionSelectionId: string }[];
   }>({});
 
-  console.log("selectedOptions: ", selectedOptions);
+  // console.log("dishDetail: ", dishDetail);
+  // console.log("selectedOptions: ", selectedOptions);
 
   const dispatch = useDispatch();
   const orderState = useSelector((state: RootState) => state.order);
   const [hasAddedToCart, setHasAddedToCart] = useState(false);
+
+  const handleInputChange = (value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
+    if (numericValue === "") {
+      setCurrentQuantity(""); // Giữ giá trị rỗng khi xóa hết
+    } else {
+      setCurrentQuantity(numericValue); // Đặt giá trị mới khi nhập số
+    }
+  };
+
+  const handleInputBlur = () => {
+    if (currentQuantity == "") setCurrentQuantity("1");
+    if (Number(currentQuantity) > dishDetail.availableQuantity)
+      setCurrentQuantity(dishDetail.availableQuantity.toString());
+  };
 
   useEffect(() => {
     if (hasAddedToCart) {
@@ -147,16 +167,16 @@ const ProductDetails = () => {
 
   const handleChangeButton = (type: string) => {
     if (type === "MINUS") {
-      if (currentQuantity > 1) {
-        setCurrentQuantity(currentQuantity - 1);
+      if (Number(currentQuantity) > 1) {
+        setCurrentQuantity((Number(currentQuantity) - 1).toString());
       }
     }
     if (type === "PLUS") {
       if (
         dishDetail?.availableQuantity &&
-        currentQuantity < dishDetail.availableQuantity
+        Number(currentQuantity) < dishDetail.availableQuantity
       ) {
-        setCurrentQuantity(currentQuantity + 1);
+        setCurrentQuantity((Number(currentQuantity) + 1).toString());
       } else {
         Toast.show({
           type: "error",
@@ -213,19 +233,6 @@ const ProductDetails = () => {
     optionSelectionId: string,
     isRadio?: boolean
   ) => {
-    // if (dishDetail) {
-    //   const totalQuantityInCart = getTotalQuantityInCart(dishDetail.dishId);
-    //   if (totalQuantityInCart >= dishDetail.availableQuantity) {
-    //     Toast.show({
-    //       type: "error",
-    //       text1: "Cannot change option",
-    //       text2: `You have ${totalQuantityInCart} products in your cart. Cannot add more products because it exceeds the available quantity (${dishDetail.availableQuantity}).`,
-    //       onPress: () => Toast.hide(),
-    //     });
-    //     return;
-    //   }
-    // }
-
     setSelectedOptions((prev) => {
       const newOptions = { ...prev };
 
@@ -240,7 +247,8 @@ const ProductDetails = () => {
       } else {
         const currentOptions = newOptions[groupId] || [];
 
-        if (isChecked) {
+        if (!isChecked) {
+          // Thêm option vào mảng nếu chưa có
           const updatedOptions = [
             ...currentOptions,
             {
@@ -248,32 +256,18 @@ const ProductDetails = () => {
               price: additionalPrice,
               optionSelectionId: optionSelectionId,
             },
-          ].sort((a, b) => a.name.localeCompare(b.name));
+          ];
 
           newOptions[groupId] = updatedOptions;
         } else {
+          // Xóa option khỏi mảng nếu đã được bỏ chọn
           newOptions[groupId] = currentOptions.filter(
             (option) => option.optionSelectionId !== optionSelectionId
           );
 
           if (newOptions[groupId].length === 0) {
-            delete newOptions[groupId];
+            delete newOptions[groupId]; // Xóa group nếu không còn lựa chọn nào
           }
-        }
-      }
-
-      if (dishDetail) {
-        const formattedOptions = formatSelectedOptions(newOptions);
-        const existingQuantity = getExistingQuantityInCart(
-          dishDetail.dishId,
-          formattedOptions
-        );
-        if (existingQuantity >= dishDetail.availableQuantity) {
-          Toast.show({
-            type: "warning",
-            text2: `You already have ${existingQuantity} products with this option in your cart. Cannot add more products.`,
-            onPress: () => Toast.hide(),
-          });
         }
       }
 
@@ -369,7 +363,7 @@ const ProductDetails = () => {
       return 0;
     });
   }, [dishDetail?.listOptions]);
-  console.log("sortedOptions: ", sortedOptions);
+  // console.log("sortedOptions: ", sortedOptions);
 
   if (loading) {
     return <Text>Loading UI</Text>;
@@ -391,317 +385,319 @@ const ProductDetails = () => {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <BackButton />
+    <ScrollView contentContainerStyle={styles.scrollView}>
+      <BackButton />
 
-        <View style={styles.carouselContainer}>
-          <Carousel
-            style={styles.carousel}
-            showsControls={false}
-            dotStyle={styles.dotStyle}
-            activeDotStyle={[styles.dotStyle, styles.activeDotStyle]}
+      <View style={styles.carouselContainer}>
+        <Carousel
+          style={styles.carousel}
+          showsControls={false}
+          dotStyle={styles.dotStyle}
+          activeDotStyle={[styles.dotStyle, styles.activeDotStyle]}
+        >
+          {images?.map((img) => (
+            <Image
+              style={styles.image}
+              source={{
+                uri: img.imageUrl,
+              }}
+              key={img.imageId}
+            />
+          ))}
+        </Carousel>
+      </View>
+
+      <View style={{ padding: Spacing }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: Spacing,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              padding: Spacing,
+              borderColor: Colors.gray,
+              borderWidth: 1,
+              borderRadius: Spacing * 0.8,
+              minHeight: 40,
+              minWidth: 90,
+            }}
           >
-            {images?.map((img) => (
-              <Image
-                style={styles.image}
-                source={{
-                  uri: img.imageUrl,
-                }}
-                key={img.imageId}
-              />
-            ))}
-          </Carousel>
+            <Text
+              style={{ color: Colors.primary, fontFamily: "outfit-medium" }}
+            >
+              {dishDetail?.categoryName}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.primary_10,
+              borderRadius: Spacing * 0.8,
+              padding: Spacing,
+            }}
+          >
+            <AntDesign
+              name="hearto"
+              size={Spacing * 2}
+              color={Colors.primary}
+            />
+          </TouchableOpacity>
         </View>
 
-        <View style={{ padding: Spacing }}>
+        <View>
+          <View>
+            <Text
+              style={{
+                fontSize: FontSize.large,
+                fontFamily: "outfit-medium",
+                marginBottom: Spacing,
+              }}
+            >
+              {dishDetail?.dishName}
+            </Text>
+          </View>
           <View
             style={{
               flexDirection: "row",
-              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: Spacing,
+            }}
+          >
+            <FontAwesome
+              name="star-half-empty"
+              size={Spacing * 1.6}
+              color={Colors.primary}
+            />
+            <Text
+              style={{
+                marginHorizontal: Spacing * 0.4,
+                fontSize: FontSize.small,
+                fontFamily: "outfit-bold",
+                color: Colors.gray,
+              }}
+            >
+              {dishDetail?.rating || "No rating"}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: Spacing,
+            }}
+          >
+            <Text
+              style={{
+                marginHorizontal: Spacing * 0.4,
+                fontSize: FontSize.small,
+                fontFamily: "outfit-bold",
+              }}
+            >
+              {formatCurrency(dishDetail?.offerPrice)} VND
+            </Text>
+            <Text
+              style={{
+                marginHorizontal: Spacing * 0.4,
+                fontSize: FontSize.small,
+                fontFamily: "outfit-medium",
+                textDecorationLine: "line-through",
+                color: Colors.primary,
+              }}
+            >
+              {formatCurrency(dishDetail?.price)} VND
+            </Text>
+          </View>
+          <View>
+            <Text
+              style={{ fontFamily: "outfit-regular", marginBottom: Spacing }}
+            >
+              {dishDetail?.description}
+            </Text>
+          </View>
+        </View>
+
+        <View>
+          {sortedOptions.map((optionGroup, groupIndex) => (
+            <View key={groupIndex}>
+              <Text
+                style={{
+                  fontFamily: "outfit-medium",
+                  fontSize: FontSize.medium,
+                }}
+              >
+                Select{" "}
+                {optionGroup.optionGroupName.toLowerCase() === "size"
+                  ? "size"
+                  : optionGroup.optionGroupName}
+                {optionGroup.optionGroupName.toLowerCase() !== "size" && (
+                  <Text>(optional)</Text>
+                )}
+              </Text>
+              {optionGroup.options.map((option, optionIndex) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    handleOptionChange(
+                      optionGroup.optionGroupId,
+                      option.optionName,
+                      Number(option.additionalPrice),
+                      selectedOptions[optionGroup.optionGroupId]?.find(
+                        (obj) =>
+                          obj.optionSelectionId === option.optionSelectionId
+                      )
+                        ? true
+                        : false, // Có trong option đang chọn không
+                      option.optionSelectionId,
+                      optionGroup.optionGroupName.toLowerCase() == "size"
+                        ? true
+                        : false
+                    )
+                  }
+                  key={optionIndex}
+                  id={`${optionGroup.optionGroupName}-${option.optionName}`}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View>
+                    <Text>
+                      {selectedOptions[optionGroup.optionGroupId] &&
+                      selectedOptions[optionGroup.optionGroupId].find(
+                        (obj) =>
+                          obj.optionSelectionId === option.optionSelectionId
+                      ) ? (
+                        <FontAwesome
+                          name="check-circle-o"
+                          size={Spacing * 2}
+                          color={Colors.primary}
+                        />
+                      ) : (
+                        <MaterialCommunityIcons
+                          name="checkbox-blank-circle-outline"
+                          size={Spacing * 2}
+                          color="black"
+                        />
+                      )}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingVertical: Spacing * 0.8,
+                      marginLeft: Spacing,
+                    }}
+                  >
+                    <Text style={{ fontFamily: "outfit-regular" }}>
+                      {option.optionName}
+                    </Text>
+
+                    <Text style={{ fontFamily: "outfit-regular" }}>
+                      + {Number(option.additionalPrice).toLocaleString()} VND
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
+
+        <View>
+          <Text
+            style={{
+              fontFamily: "outfit-medium",
+              fontSize: FontSize.medium,
+              marginVertical: Spacing,
+            }}
+          >
+            Select Quantity (Available: {dishDetail?.availableQuantity})
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
               alignItems: "center",
               marginBottom: Spacing,
             }}
           >
             <TouchableOpacity
-              style={{
-                padding: Spacing,
-                borderColor: Colors.gray,
-                borderWidth: 1,
-                borderRadius: Spacing * 0.8,
-                minHeight: 40,
-                minWidth: 90,
-              }}
-            >
-              <Text
-                style={{ color: Colors.primary, fontFamily: "outfit-medium" }}
-              >
-                {dishDetail?.categoryName}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                backgroundColor: Colors.primary_10,
-                borderRadius: Spacing * 0.8,
-                padding: Spacing,
-              }}
+              onPress={() => handleChangeButton("MINUS")}
+              style={[
+                styles.changeQuantity,
+                { backgroundColor: Colors.primary_10 },
+              ]}
             >
               <AntDesign
-                name="hearto"
-                size={Spacing * 2}
+                name="minus"
+                size={FontSize.medium}
                 color={Colors.primary}
               />
             </TouchableOpacity>
-          </View>
-
-          <View>
-            <View>
-              <Text
-                style={{
-                  fontSize: FontSize.large,
-                  fontFamily: "outfit-medium",
-                  marginBottom: Spacing,
-                }}
-              >
-                {dishDetail?.dishName}
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: Spacing,
+            <TextInput
+              maxLength={4}
+              onChangeText={handleInputChange}
+              onBlur={() => {
+                handleInputBlur();
               }}
+              keyboardType="numeric"
+              numberOfLines={1}
+              value={currentQuantity.toString()}
+              style={{
+                fontFamily: "outfit-medium",
+                width: 50,
+                paddingHorizontal: Spacing * 0.4,
+                textAlign: "center",
+              }}
+            />
+            <TouchableOpacity
+              onPress={() => handleChangeButton("PLUS")}
+              style={[
+                styles.changeQuantity,
+                { backgroundColor: Colors.primary },
+              ]}
             >
-              <FontAwesome
-                name="star-half-empty"
-                size={Spacing * 1.6}
-                color={Colors.primary}
+              <AntDesign
+                name="plus"
+                size={FontSize.medium}
+                color={Colors.white}
               />
-              <Text
-                style={{
-                  marginHorizontal: Spacing * 0.4,
-                  fontSize: FontSize.small,
-                  fontFamily: "outfit-bold",
-                  color: Colors.gray,
-                }}
-              >
-                4.8 Rating
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: Spacing,
-              }}
-            >
-              <Text
-                style={{
-                  marginHorizontal: Spacing * 0.4,
-                  fontSize: FontSize.small,
-                  fontFamily: "outfit-bold",
-                }}
-              >
-                {formatCurrency(dishDetail?.offerPrice)} VND
-              </Text>
-              <Text
-                style={{
-                  marginHorizontal: Spacing * 0.4,
-                  fontSize: FontSize.small,
-                  fontFamily: "outfit-medium",
-                  textDecorationLine: "line-through",
-                  color: Colors.primary,
-                }}
-              >
-                {formatCurrency(dishDetail?.price)} VND
-              </Text>
-            </View>
-            <View>
-              <Text
-                style={{ fontFamily: "outfit-regular", marginBottom: Spacing }}
-              >
-                {dishDetail?.description}
-              </Text>
-            </View>
-          </View>
-
-          <View>
-            {sortedOptions.map((optionGroup, groupIndex) => (
-              <View key={groupIndex}>
-                <Text
-                  style={{
-                    fontFamily: "outfit-medium",
-                    fontSize: FontSize.medium,
-                  }}
-                >
-                  Select{" "}
-                  {optionGroup.optionGroupName.toLowerCase() === "size"
-                    ? "size"
-                    : optionGroup.optionGroupName}
-                  {optionGroup.optionGroupName.toLowerCase() !== "size" && (
-                    <span> (optional)</span>
-                  )}
-                </Text>
-                {optionGroup.options.map((option, optionIndex) => (
-                  <View
-                    key={optionIndex}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <View>
-                      <input
-                        type={
-                          optionGroup.optionGroupName.toLowerCase() === "size"
-                            ? "radio"
-                            : "checkbox"
-                        }
-                        name={`optionGroup${groupIndex}`}
-                        id={`${optionGroup.optionGroupName}-${option.optionName}`}
-                        onChange={(e) =>
-                          handleOptionChange(
-                            optionGroup.optionGroupId,
-                            option.optionName,
-                            Number(option.additionalPrice),
-                            e.target.checked,
-                            option.optionSelectionId,
-                            optionGroup.optionGroupName.toLowerCase() === "size"
-                          )
-                        }
-                      />
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        paddingVertical: Spacing * 0.8,
-                      }}
-                    >
-                      <Text style={{ fontFamily: "outfit-regular" }}>
-                        {option.optionName}
-                      </Text>
-
-                      {/* <Text>
-                        {selectedOptions[optionGroup.optionGroupId] &&
-                        (selectedOptions[optionGroup.optionGroupId].find(
-                          (optionSelection) =>
-                            optionSelection.optionSelectionId ==
-                            option.optionSelectionId
-                        )
-                          ? true
-                          : false)
-                          ? "Chon"
-                          : "Khong"}
-                      </Text> */}
-
-                      <Text style={{ fontFamily: "outfit-regular" }}>
-                        + {Number(option.additionalPrice).toLocaleString()} VND
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            ))}
+            </TouchableOpacity>
           </View>
 
           <View>
             <Text
               style={{
-                fontFamily: "outfit-medium",
-                fontSize: FontSize.medium,
-                marginVertical: Spacing,
+                fontFamily: "outfit-bold",
+                fontSize: FontSize.large,
+                padding: Spacing * 0.6,
               }}
             >
-              Select Quantity (Available: {dishDetail?.availableQuantity})
+              {calculateTotalPrice().toLocaleString("vi-VN")} VND
             </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: Spacing,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => handleChangeButton("MINUS")}
-                style={[
-                  styles.changeQuantity,
-                  { backgroundColor: Colors.primary_10 },
-                ]}
-              >
-                <AntDesign
-                  name="minus"
-                  size={FontSize.medium}
-                  color={Colors.primary}
-                />
-              </TouchableOpacity>
-              <TextInput
-                maxLength={4}
-                // onChangeText={handleInputChange}
-                keyboardType="numeric"
-                numberOfLines={1}
-                value={currentQuantity}
-                style={{
-                  fontFamily: "outfit-medium",
-                  width: 50,
-                  paddingHorizontal: Spacing * 0.4,
-                  textAlign: "center",
-                }}
-              />
-              <TouchableOpacity
-                onPress={() => handleChangeButton("PLUS")}
-                style={[
-                  styles.changeQuantity,
-                  { backgroundColor: Colors.primary },
-                ]}
-              >
-                <AntDesign
-                  name="plus"
-                  size={FontSize.medium}
-                  color={Colors.white}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <View>
-              <Text
-                style={{
-                  fontFamily: "outfit-bold",
-                  fontSize: FontSize.large,
-                  padding: Spacing * 0.6,
-                }}
-              >
-                {calculateTotalPrice().toLocaleString("vi-VN")} VND
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.signInButton}
-              onPress={() => handleAddToCart()}
-            >
-              <Text style={styles.signInText}>Add to cart</Text>
-            </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            style={styles.signInButton}
+            onPress={() => handleAddToCart()}
+          >
+            <Text style={styles.signInText}>Add to cart</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScrollView>
   );
 };
 
 export default ProductDetails;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight,
-    backgroundColor: "white",
-  },
   scrollView: {
-    flexGrow: 1,
+    backgroundColor: "#fff",
   },
   carouselContainer: {
     height: (height - 20) / 2.5,

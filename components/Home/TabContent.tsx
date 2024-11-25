@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from "react-native-vector-icons/FontAwesome";
+import { router } from "expo-router";
 
 const CategoryItem = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -9,18 +10,22 @@ const CategoryItem = () => {
     {
       name: "Home",
       icon: "home",
+      redirectUrl: "../(tabs)/home",
     },
     {
       name: "Food",
       icon: "cutlery",
+      redirectUrl: "../(tabs)/search",
     },
     {
-      name: "Book",
+      name: "Blog",
       icon: "book",
+      redirectUrl: "../(blog)/blogList",
     },
     {
       name: "News",
       icon: "newspaper-o",
+      redirectUrl: "../(tabs)/home",
     },
   ];
 
@@ -33,14 +38,17 @@ const CategoryItem = () => {
               styles.itemContainer,
               activeIndex === index && styles.activeContainer,
             ]}
-            onPress={() => setActiveIndex(index)}
+            onPress={() => router.push(item.redirectUrl)}
+            // onPress={() => setActiveIndex(index)}
           >
-            <Icon name={item.icon} size={40} color={activeIndex === index ? "#fff" : "#F76D02"} />
+            <Icon
+              name={item.icon}
+              size={40}
+              color={activeIndex === index ? "#fff" : "#F76D02"}
+            />
           </TouchableOpacity>
           <Text
-            style={[
-              styles.itemText,
-            ]}
+            style={[styles.itemText]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -58,7 +66,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start", // Căn giữa các mục
     paddingVertical: 10,
     paddingHorizontal: 2,
-    gap: 12
+    gap: 12,
   },
   itemWrapper: {
     alignItems: "center", // Căn giữa các mục

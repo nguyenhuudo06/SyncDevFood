@@ -5,6 +5,7 @@ import FontSize from "@/constants/FontSize";
 import Spacing from "@/constants/Spacing";
 import { RootState } from "@/redux/store";
 import { callGetOrderById } from "@/services/api-call";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -50,7 +51,7 @@ interface Address {
   updatedAt: string;
 }
 
-interface OrderResponse {
+export interface OrderResponse {
   orderId: string;
   userId: string;
   userEmail: string;
@@ -80,6 +81,8 @@ const Order = () => {
   const [orderData, setOrderData] = useState<OrderResponse[] | []>([]);
   const userId = useSelector((state: RootState) => state.auth.user_id);
 
+  console.log(orderData)
+
   const fetchOrders = async (page = 0) => {
     const pageSize = 6;
     const urlParams = `pageNo=${page}&pageSize=${pageSize}&sortBy=createdAt&sortDir=desc`;
@@ -100,12 +103,6 @@ const Order = () => {
       setOrderData((prev) => (page === 0 ? orders : [...prev, ...orders]));
     } catch (error) {
       console.error("Error fetching order data:", error);
-      // Toast.show({
-      //   type: "customToast",
-      //   text1: "Something wrong!",
-      //   onPress: () => Toast.hide(),
-      //   visibilityTime: 1800,
-      // });
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -128,19 +125,30 @@ const Order = () => {
   if (loading) return <Loading />;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.content}>
       <HeaderPage titlePage="Order" />
-      <View style={{ padding: Spacing, flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <FlatList
-          style={{ flex: 1 }}
+          style={{ padding: Spacing }}
           data={orderData}
           keyExtractor={(item) => item.orderId}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.listCard}>
+            <TouchableOpacity
+              style={[styles.listCard, styles.dropShadow]}
+              onPress={() =>
+                router.push({
+                  pathname: `../(order)/order/${item.orderId}`,
+                  params: {
+                    orderItems: JSON.stringify(item.orderItems),
+                    orderDetails: JSON.stringify(item),
+                  },
+                })
+              }
+            >
               {/* Order Id */}
               <View style={{ marginBottom: Spacing * 0.6 }}>
                 <Text style={styles.listCardTitle} numberOfLines={1}>
-                  Order Id:
+                  Order Id:{" "}
                   <Text style={styles.listCardTitleFollow}>{item.orderId}</Text>
                 </Text>
               </View>
@@ -148,7 +156,7 @@ const Order = () => {
               {/* Order date */}
               <View style={{ marginBottom: Spacing * 0.6 }}>
                 <Text style={styles.listCardTitle} numberOfLines={1}>
-                  Order date:
+                  Order date:{" "}
                   <Text style={styles.listCardTitleFollow}>
                     {new Date(item.createdAt).toLocaleDateString("vi-VN")}
                   </Text>
@@ -158,7 +166,7 @@ const Order = () => {
               {/* Order date */}
               <View style={{ marginBottom: Spacing * 0.6 }}>
                 <View style={styles.flexStart}>
-                  <Text style={styles.listCardTitle}>Status:</Text>
+                  <Text style={styles.listCardTitle}>Status: </Text>
                   <Text
                     style={[
                       styles.listCardStatus,
@@ -173,7 +181,7 @@ const Order = () => {
               {/* Order date */}
               <View>
                 <Text style={styles.listCardTitle} numberOfLines={1}>
-                  Total:
+                  Total:{" "}
                   <Text
                     style={[
                       styles.listCardTitleFollow,
@@ -187,10 +195,14 @@ const Order = () => {
             </TouchableOpacity>
           )}
           onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.1}
+          onEndReachedThreshold={0.5}
           ListFooterComponent={
             loadingMore ? (
-              <ActivityIndicator size="small" color="#0000ff" />
+              <ActivityIndicator
+                style={{ padding: Spacing, marginBottom: Spacing }}
+                size="small"
+                color="#0000ff"
+              />
             ) : null
           }
         />
@@ -202,8 +214,12 @@ const Order = () => {
 export default Order;
 
 const styles = StyleSheet.create({
+  content: {
+    backgroundColor: "#fff",
+    flex: 1,
+  },
   listCard: {
-    backgroundColor: Colors.primary_10,
+    backgroundColor: Colors.white,
     padding: Spacing,
     paddingHorizontal: Spacing,
     borderRadius: Spacing * 0.8,
@@ -228,5 +244,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing * 0.8,
     paddingVertical: Spacing * 0.2,
     borderRadius: Spacing * 0.8,
+  },
+  dropShadow: {
+    borderRadius: Spacing * 0.8,
+    backgroundColor: Colors.white,
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
 });
