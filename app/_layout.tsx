@@ -92,7 +92,7 @@ export default function RootLayout() {
       <TouchableOpacity
         style={{
           backgroundColor: "#0B192C",
-          maxWidth: 200,
+          maxWidth: 300,
           padding: Spacing * 0.6,
           borderRadius: Spacing * 3,
           top: 30,
@@ -171,12 +171,12 @@ export default function RootLayout() {
               />
 
               <Stack.Screen
-                name="(blog)/blogId/[blogId]"
+                name="(blog)/blogList"
                 options={{ headerShown: false }}
               />
 
               <Stack.Screen
-                name="(blog)/blogList"
+                name="(blog)/blogId/[blogDetails]"
                 options={{ headerShown: false }}
               />
 

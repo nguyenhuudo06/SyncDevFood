@@ -15,7 +15,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.nguyenhuudo1206.syncdevfood"
     },
     "web": {
       "bundler": "metro",
@@ -47,6 +49,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "4eb0604e-1b0f-4166-9af9-85c27b45b718"
+      }
     }
   }
 }

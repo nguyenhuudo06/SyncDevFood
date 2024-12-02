@@ -19,16 +19,19 @@ import Colors from "@/constants/Colors";
 import FontSize from "@/constants/FontSize";
 import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
 import ImageWithFallback from "@/components/Image/ImageWithFallback";
-import { callUpdateAvatar } from "@/services/api-call";
+import { callProfile, callUpdateAvatar } from "@/services/api-call";
 import axios from "axios";
+import Toast from "react-native-toast-message";
+import { login } from "@/redux/authSlice/authSlice";
 
 const AvatarConfig = () => {
   const userData = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const [bottomModalImage, setBottomModalImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const user_avatar = useSelector((state: RootState) => state.auth.user_avatar);
 
-  console.log(selectedImage);
+  // console.log(selectedImage);
 
   // Hỏi quyền đăng nhập
   const requestPermission = async () => {
@@ -137,7 +140,12 @@ const AvatarConfig = () => {
 
   const uploadImage = async () => {
     if (!selectedImage) {
-      Alert.alert("Thông báo", "Vui lòng chọn một ảnh để upload.");
+      Toast.show({
+        type: "customToast",
+        text1: "No image selected yet!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1000,
+      });
       return;
     }
 
@@ -161,26 +169,23 @@ const AvatarConfig = () => {
 
       if (apiResponse.status != 200) throw new Error("Error upload avatar!");
 
-      Alert.alert("Thành công", "Ảnh đã được upload!");
+      Toast.show({
+        type: "customToast",
+        text1: "Uploaded successfully!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1000,
+      });
+
+      const responseProfile = await callProfile();
+
+      if (responseProfile.status != 200)
+        throw new Error("Error fetch profile!");
+
+      dispatch(login(responseProfile.data));
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Axios Error Details:");
         console.error("Message:", error.message);
-
-        if (error.response) {
-          // Lỗi từ phía server (status code, dữ liệu phản hồi)
-          console.error("Response data:", error.response.data);
-          console.error("Response status:", error.response.status);
-          console.error("Response headers:", error.response.headers);
-        } else if (error.request) {
-          // Lỗi khi request đã được gửi nhưng không nhận được phản hồi
-          console.error("Request details:", error.request);
-        } else {
-          // Lỗi khác (thường là lỗi cấu hình)
-          console.error("Error config:", error.config);
-        }
       } else {
-        // Lỗi không thuộc axios (có thể do các thư viện khác)
         console.error("Unknown error:", error);
       }
       Alert.alert("Lỗi", "Không thể upload ảnh.");
@@ -213,7 +218,7 @@ const AvatarConfig = () => {
             }}
           >
             <ImageWithFallback
-              source={{ uri: selectedImage }}
+              source={{ uri: selectedImage || user_avatar }}
               fallbackSource={require("../../assets/images/avatar-png.png")}
               style={{
                 width: "100%",

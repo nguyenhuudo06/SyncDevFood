@@ -37,16 +37,6 @@ const Header = () => {
                 <TouchableOpacity
                   onPress={() => router.push("../(tabs)/profile")}
                 >
-                  {/* <Image
-                    style={{
-                      width: Spacing * 4.5,
-                      height: Spacing * 4.5,
-                      borderRadius: Spacing * 3,
-                      marginRight: Spacing,
-                    }}
-                    source={require("../../assets/images/avatart-template.jpg")}
-                  /> */}
-
                   <ImageWithFallback
                     source={{ uri: userData.user_avatar }}
                     fallbackSource={require("../../assets/images/pngegg.png")}
@@ -55,13 +45,15 @@ const Header = () => {
                       height: Spacing * 4.5,
                       borderRadius: Spacing * 3,
                       marginRight: Spacing,
+                      borderWidth: 1,
+                      borderColor: Colors.gray,
                     }}
                     resizeMode="cover"
                   />
                 </TouchableOpacity>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("../../(tabs)/profile")}>
                   <Ionicons
                     name="menu"
                     size={Spacing * 3.5}

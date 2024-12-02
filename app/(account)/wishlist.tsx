@@ -15,10 +15,14 @@ import HeaderPage from "@/components/HeaderPage/HeaderPage";
 import Spacing from "@/constants/Spacing";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { callGetWishListById } from "@/services/api-call";
+import {
+  callDeleteDishFromWishList,
+  callGetWishListById,
+} from "@/services/api-call";
 import Colors from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
+import Toast from "react-native-toast-message";
 
 const Wishlist = () => {
   const [loading, setLoading] = useState(false);
@@ -50,28 +54,28 @@ const Wishlist = () => {
     }))
   );
 
-  console.log(wishListConvert);
-
   const fetchData = async (page = 0) => {
-    const pageSize = 1;
-    const urlParams = `pageNo=${page}&pageSize=${pageSize}&sortBy=createdAt&sortDir=desc`;
-
     if (page === 0) setLoading(true);
     else setLoadingMore(true);
 
+    if (!hasMore || loading) return;
+
     try {
       const response = await callGetWishListById(userId || "");
-
       if (response.status < 200 || response.status >= 300) {
         throw new Error("Request failed with status " + response.status);
       }
 
       const orders = response.data._embedded?.wishlistResponseList || [];
-      if (orders.length < pageSize) setHasMore(false);
+      const totalPage = response.data.page.totalPages;
 
+      // Ngừng tải thêm nếu không còn dữ liệu hoặc dữ liệu ít hơn `pageSize`
+      setHasMore((page >= Number(totalPage) - 1) ? false : true);
+
+      // Gộp dữ liệu nếu có nhiều trang
       setWishList((prev) => (page === 0 ? orders : [...prev, ...orders]));
     } catch (error) {
-      console.error("Error fetching order data:", error);
+      console.error("Error fetching wishlist data:", error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -79,13 +83,41 @@ const Wishlist = () => {
     }
   };
 
+  const handleDeleteWishList = async (dishId: string) => {
+    try {
+      const response = await callDeleteDishFromWishList(dishId, userId);
+
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error("Request failed with status " + response.status);
+      }
+
+      Toast.show({
+        type: "customToast",
+        text1: "Removed successfully!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+
+      fetchData(0);
+    } catch (error) {
+      console.error("Remove error: ", error);
+      Toast.show({
+        type: "customToast",
+        text1: "Failed remove!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+    }
+  };
+
   const handleLoadMore = () => {
-    if (hasMore && !loadingMore) {
+    if (hasMore && !loadingMore && !loading) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
       fetchData(nextPage);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, [userId]);
@@ -108,7 +140,7 @@ const Wishlist = () => {
               <TouchableOpacity
                 onPress={(e) => {
                   e.stopPropagation();
-                  console.log("hhhh");
+                  handleDeleteWishList(item.dishId);
                 }}
                 style={[styles.absoluteDeleleIcon]}
               >

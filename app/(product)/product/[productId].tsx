@@ -23,6 +23,7 @@ import { router } from "expo-router";
 import { useRoute } from "@react-navigation/native";
 import BackButton from "@/components/Material/BackButton";
 import {
+  callAddDishToWishList,
   callGetAllDishes,
   callGetDishDetail,
   callProductDetail,
@@ -33,6 +34,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Toast from "react-native-toast-message";
 import { CartItem, doAddProductAction } from "@/redux/orderSlice/orderSlice";
+import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
+import RenderHTML from "react-native-render-html";
+import WebView from "react-native-webview";
+import CommentSection from "@/components/Comment/Comment";
+import Comment from "@/components/Comment/Comment";
+import Loading from "@/components/Loading/Loading";
+import RatingChoose from "@/components/Comment/RatingChoose";
 
 const height = Dimensions.get("window").height;
 
@@ -70,6 +78,10 @@ interface DishDetail {
 const ProductDetails = () => {
   const route = useRoute();
   const { productId } = route.params;
+  const [bottomModal, setBottomModal] = useState({
+    description: false,
+    reviews: false,
+  });
 
   const [dishDetail, setDishDetail] = useState<DishDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,8 +90,24 @@ const ProductDetails = () => {
     [key: string]: { name: string; price: number; optionSelectionId: string }[];
   }>({});
 
-  // console.log("dishDetail: ", dishDetail);
-  // console.log("selectedOptions: ", selectedOptions);
+  const userId = useSelector((state: RootState) => state.auth.user_id);
+
+  const modifiedHtml = `
+  <html>
+    <head>
+      <style>
+        body {
+          font-size: 40px;
+          line-height: 1.6;
+          font-family: Arial, sans-serif;
+        }
+      </style>
+    </head>
+    <body>
+      ${dishDetail?.longDescription}
+    </body>
+  </html>
+`;
 
   const dispatch = useDispatch();
   const orderState = useSelector((state: RootState) => state.order);
@@ -113,7 +141,7 @@ const ProductDetails = () => {
         dispatch({ type: "order/resetStatus" });
       } else if (orderState.status === "error" && orderState.error) {
         Toast.show({
-          type: "error",
+          type: "customToast",
           text1: "Cannot add to cart",
           text2: orderState.error,
           onPress: () => Toast.hide(),
@@ -305,7 +333,7 @@ const ProductDetails = () => {
 
       if (!isRadioSelected) {
         Toast.show({
-          type: "error",
+          type: "customToast",
           text1: "Please select size before adding to cart!",
           onPress: () => Toast.hide(),
         });
@@ -313,13 +341,13 @@ const ProductDetails = () => {
       }
 
       const totalQuantityInCart = getTotalQuantityInCart(dishDetail.dishId);
-      const newTotalQuantity = totalQuantityInCart + currentQuantity;
+      const newTotalQuantity =
+        Number(totalQuantityInCart) + Number(currentQuantity);
 
       if (newTotalQuantity > dishDetail.availableQuantity) {
         Toast.show({
-          type: "error",
+          type: "customToast",
           text1: "Cannot add to cart",
-          text2: `You have ${totalQuantityInCart} products in your cart. Cannot add ${currentQuantity} more products because it exceeds the available quantity (${dishDetail.availableQuantity}).`,
           onPress: () => Toast.hide(),
         });
         return;
@@ -339,7 +367,7 @@ const ProductDetails = () => {
       );
 
       const cartItem = {
-        quantity: currentQuantity,
+        quantity: Number(currentQuantity),
         dishId: dishDetail.dishId,
         detail: {
           dishName: dishDetail.dishName,
@@ -355,6 +383,40 @@ const ProductDetails = () => {
     }
   };
 
+  const addDishToWishList = async () => {
+    try {
+      const response = await callAddDishToWishList(dishDetail?.dishId, userId);
+
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error("Request failed with status " + response.status);
+      }
+
+      Toast.show({
+        type: "customToast",
+        text1: "Add to wishlist successfully!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+    } catch (error) {
+      console.error("Add wishlist error: ", error);
+      if (!userId) {
+        Toast.show({
+          type: "customToast",
+          text1: "Please login first!",
+          onPress: () => Toast.hide(),
+          visibilityTime: 1800,
+        });
+      } else {
+        Toast.show({
+          type: "customToast",
+          text1: "Failed to add wishlist",
+          onPress: () => Toast.hide(),
+          visibilityTime: 1800,
+        });
+      }
+    }
+  };
+
   const sortedOptions = useMemo(() => {
     const options = dishDetail?.listOptions || [];
     return [...options].sort((a, b) => {
@@ -363,10 +425,9 @@ const ProductDetails = () => {
       return 0;
     });
   }, [dishDetail?.listOptions]);
-  // console.log("sortedOptions: ", sortedOptions);
 
   if (loading) {
-    return <Text>Loading UI</Text>;
+    return <Loading />;
   }
 
   if (!dishDetail) {
@@ -397,47 +458,24 @@ const ProductDetails = () => {
         >
           {images?.map((img) => (
             <Image
-              style={styles.image}
-              source={{
-                uri: img.imageUrl,
-              }}
+              style={styles.carouselImage}
+              source={{ uri: img.imageUrl }}
               key={img.imageId}
             />
           ))}
         </Carousel>
       </View>
 
-      <View style={{ padding: Spacing }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: Spacing,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              padding: Spacing,
-              borderColor: Colors.gray,
-              borderWidth: 1,
-              borderRadius: Spacing * 0.8,
-              minHeight: 40,
-              minWidth: 90,
-            }}
-          >
-            <Text
-              style={{ color: Colors.primary, fontFamily: "outfit-medium" }}
-            >
+      <View style={styles.contentContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.categoryButton}>
+            <Text style={styles.categoryButtonText}>
               {dishDetail?.categoryName}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{
-              backgroundColor: Colors.primary_10,
-              borderRadius: Spacing * 0.8,
-              padding: Spacing,
-            }}
+            style={styles.favoriteButton}
+            onPress={() => addDishToWishList()}
           >
             <AntDesign
               name="hearto"
@@ -448,189 +486,95 @@ const ProductDetails = () => {
         </View>
 
         <View>
-          <View>
-            <Text
-              style={{
-                fontSize: FontSize.large,
-                fontFamily: "outfit-medium",
-                marginBottom: Spacing,
-              }}
-            >
-              {dishDetail?.dishName}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: Spacing,
-            }}
-          >
+          <Text style={styles.dishName}>{dishDetail?.dishName}</Text>
+          <View style={styles.ratingContainer}>
             <FontAwesome
               name="star-half-empty"
               size={Spacing * 1.6}
               color={Colors.primary}
             />
-            <Text
-              style={{
-                marginHorizontal: Spacing * 0.4,
-                fontSize: FontSize.small,
-                fontFamily: "outfit-bold",
-                color: Colors.gray,
-              }}
-            >
+            <Text style={styles.ratingText}>
               {dishDetail?.rating || "No rating"}
             </Text>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: Spacing,
-            }}
-          >
-            <Text
-              style={{
-                marginHorizontal: Spacing * 0.4,
-                fontSize: FontSize.small,
-                fontFamily: "outfit-bold",
-              }}
-            >
+
+          <View style={styles.priceContainer}>
+            <Text style={styles.currentPrice}>
               {formatCurrency(dishDetail?.offerPrice)} VND
             </Text>
-            <Text
-              style={{
-                marginHorizontal: Spacing * 0.4,
-                fontSize: FontSize.small,
-                fontFamily: "outfit-medium",
-                textDecorationLine: "line-through",
-                color: Colors.primary,
-              }}
-            >
+            <Text style={styles.originalPrice}>
               {formatCurrency(dishDetail?.price)} VND
             </Text>
           </View>
-          <View>
-            <Text
-              style={{ fontFamily: "outfit-regular", marginBottom: Spacing }}
-            >
-              {dishDetail?.description}
+
+          <Text style={styles.description}>{dishDetail?.description}</Text>
+        </View>
+
+        {sortedOptions.map((optionGroup, groupIndex) => (
+          <View key={groupIndex}>
+            <Text style={styles.optionGroupTitle}>
+              Select{" "}
+              {optionGroup.optionGroupName.toLowerCase() === "size"
+                ? "size"
+                : optionGroup.optionGroupName}
+              {optionGroup.optionGroupName.toLowerCase() !== "size" && (
+                <Text style={styles.optionalText}>(optional)</Text>
+              )}
             </Text>
-          </View>
-        </View>
-
-        <View>
-          {sortedOptions.map((optionGroup, groupIndex) => (
-            <View key={groupIndex}>
-              <Text
-                style={{
-                  fontFamily: "outfit-medium",
-                  fontSize: FontSize.medium,
-                }}
+            {optionGroup.options.map((option, optionIndex) => (
+              <TouchableOpacity
+                key={optionIndex}
+                onPress={() =>
+                  handleOptionChange(
+                    optionGroup.optionGroupId,
+                    option.optionName,
+                    Number(option.additionalPrice),
+                    !!selectedOptions[optionGroup.optionGroupId]?.find(
+                      (obj) =>
+                        obj.optionSelectionId === option.optionSelectionId
+                    ),
+                    option.optionSelectionId,
+                    optionGroup.optionGroupName.toLowerCase() === "size"
+                  )
+                }
+                style={styles.optionContainer}
               >
-                Select{" "}
-                {optionGroup.optionGroupName.toLowerCase() === "size"
-                  ? "size"
-                  : optionGroup.optionGroupName}
-                {optionGroup.optionGroupName.toLowerCase() !== "size" && (
-                  <Text>(optional)</Text>
-                )}
-              </Text>
-              {optionGroup.options.map((option, optionIndex) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    handleOptionChange(
-                      optionGroup.optionGroupId,
-                      option.optionName,
-                      Number(option.additionalPrice),
-                      selectedOptions[optionGroup.optionGroupId]?.find(
-                        (obj) =>
-                          obj.optionSelectionId === option.optionSelectionId
-                      )
-                        ? true
-                        : false, // Có trong option đang chọn không
-                      option.optionSelectionId,
-                      optionGroup.optionGroupName.toLowerCase() == "size"
-                        ? true
-                        : false
-                    )
-                  }
-                  key={optionIndex}
-                  id={`${optionGroup.optionGroupName}-${option.optionName}`}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View>
-                    <Text>
-                      {selectedOptions[optionGroup.optionGroupId] &&
-                      selectedOptions[optionGroup.optionGroupId].find(
-                        (obj) =>
-                          obj.optionSelectionId === option.optionSelectionId
-                      ) ? (
-                        <FontAwesome
-                          name="check-circle-o"
-                          size={Spacing * 2}
-                          color={Colors.primary}
-                        />
-                      ) : (
-                        <MaterialCommunityIcons
-                          name="checkbox-blank-circle-outline"
-                          size={Spacing * 2}
-                          color="black"
-                        />
-                      )}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      paddingVertical: Spacing * 0.8,
-                      marginLeft: Spacing,
-                    }}
-                  >
-                    <Text style={{ fontFamily: "outfit-regular" }}>
-                      {option.optionName}
-                    </Text>
-
-                    <Text style={{ fontFamily: "outfit-regular" }}>
-                      + {Number(option.additionalPrice).toLocaleString()} VND
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-        </View>
+                <View>
+                  {selectedOptions[optionGroup.optionGroupId]?.some(
+                    (obj) => obj.optionSelectionId === option.optionSelectionId
+                  ) ? (
+                    <FontAwesome
+                      name="check-circle-o"
+                      size={Spacing * 2}
+                      color={Colors.primary}
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name="checkbox-blank-circle-outline"
+                      size={Spacing * 2}
+                      color="black"
+                    />
+                  )}
+                </View>
+                <View style={styles.optionDetails}>
+                  <Text style={styles.optionName}>{option.optionName}</Text>
+                  <Text style={styles.optionPrice}>
+                    + {Number(option.additionalPrice).toLocaleString()} VND
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
 
         <View>
-          <Text
-            style={{
-              fontFamily: "outfit-medium",
-              fontSize: FontSize.medium,
-              marginVertical: Spacing,
-            }}
-          >
+          <Text style={styles.quantityTitle}>
             Select Quantity (Available: {dishDetail?.availableQuantity})
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: Spacing,
-            }}
-          >
+          <View style={styles.quantityContainer}>
             <TouchableOpacity
               onPress={() => handleChangeButton("MINUS")}
-              style={[
-                styles.changeQuantity,
-                { backgroundColor: Colors.primary_10 },
-              ]}
+              style={[styles.changeQuantity, styles.quantityMinus]}
             >
               <AntDesign
                 name="minus"
@@ -641,25 +585,14 @@ const ProductDetails = () => {
             <TextInput
               maxLength={4}
               onChangeText={handleInputChange}
-              onBlur={() => {
-                handleInputBlur();
-              }}
+              onBlur={handleInputBlur}
               keyboardType="numeric"
-              numberOfLines={1}
               value={currentQuantity.toString()}
-              style={{
-                fontFamily: "outfit-medium",
-                width: 50,
-                paddingHorizontal: Spacing * 0.4,
-                textAlign: "center",
-              }}
+              style={styles.quantityInput}
             />
             <TouchableOpacity
               onPress={() => handleChangeButton("PLUS")}
-              style={[
-                styles.changeQuantity,
-                { backgroundColor: Colors.primary },
-              ]}
+              style={[styles.changeQuantity, styles.quantityPlus]}
             >
               <AntDesign
                 name="plus"
@@ -668,37 +601,157 @@ const ProductDetails = () => {
               />
             </TouchableOpacity>
           </View>
-
-          <View>
-            <Text
-              style={{
-                fontFamily: "outfit-bold",
-                fontSize: FontSize.large,
-                padding: Spacing * 0.6,
-              }}
-            >
-              {calculateTotalPrice().toLocaleString("vi-VN")} VND
-            </Text>
-          </View>
-
+          <Text style={styles.totalPrice}>
+            {calculateTotalPrice().toLocaleString("vi-VN")} VND
+          </Text>
           <TouchableOpacity
-            style={styles.signInButton}
-            onPress={() => handleAddToCart()}
+            style={styles.addToCartButton}
+            onPress={handleAddToCart}
           >
-            <Text style={styles.signInText}>Add to cart</Text>
+            <Text style={styles.addToCartText}>Add to cart</Text>
           </TouchableOpacity>
         </View>
+
+        <View
+          style={[
+            styles.flexBetween,
+            {
+              backgroundColor: Colors.backgroundBox,
+              padding: Spacing,
+              borderRadius: Spacing * 0.8,
+              marginBottom: Spacing,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={[styles.contentModalButton]}
+            onPress={() =>
+              setBottomModal((prevState) => ({
+                ...prevState,
+                description: true,
+              }))
+            }
+          >
+            <Text style={[styles.contentModalButtonContent]}>Description</Text>
+          </TouchableOpacity>
+          <View style={styles.divider} />
+          <TouchableOpacity
+            style={[styles.contentModalButton]}
+            onPress={() =>
+              setBottomModal((prevState) => ({
+                ...prevState,
+                reviews: true,
+              }))
+            }
+          >
+            <Text style={[styles.contentModalButtonContent]}>Reviews</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Comment */}
+        <View style={[styles.commentForm]}>
+          <View>
+            <RatingChoose dishId={dishDetail.dishId} />
+          </View>
+        </View>
       </View>
+
+      {/* Description */}
+      <BottomModal
+        visible={bottomModal.description}
+        onTouchOutside={() =>
+          setBottomModal((prevState) => ({
+            ...prevState,
+            description: false,
+          }))
+        }
+        overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
+        height={0.8}
+        width={1}
+        onSwipeOut={() =>
+          setBottomModal((prevState) => ({
+            ...prevState,
+            description: false,
+          }))
+        }
+      >
+        <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
+          <ScrollView contentContainerStyle={{ flex: 1 }}>
+            <View style={styles.bottomModalContent}>
+              <WebView
+                originWhitelist={["*"]}
+                source={{ html: modifiedHtml }}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </ScrollView>
+        </ModalContent>
+      </BottomModal>
+
+      {/* Reviews */}
+      <BottomModal
+        visible={bottomModal.reviews}
+        onTouchOutside={() =>
+          setBottomModal((prevState) => ({
+            ...prevState,
+            reviews: false,
+          }))
+        }
+        overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
+        height={0.8}
+        width={1}
+        onSwipeOut={() =>
+          setBottomModal((prevState) => ({
+            ...prevState,
+            reviews: false,
+          }))
+        }
+      >
+        <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
+          <View style={styles.bottomModalContent}>
+            <Comment dishId={productId} />
+          </View>
+        </ModalContent>
+      </BottomModal>
     </ScrollView>
   );
 };
 
 export default ProductDetails;
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: "#fff",
+const shared = StyleSheet.create({
+  button: {
+    padding: Spacing,
+    borderRadius: Spacing * 0.8,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 40,
   },
+  text: {
+    fontFamily: "outfit-regular",
+  },
+});
+
+const styles = StyleSheet.create({
+  commentForm: {
+    paddingVertical: Spacing,
+  },
+  bottomModalContent: { flex: 1 },
+  contentModalButton: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  contentModalButtonContent: {
+    textAlign: "center",
+    fontFamily: "outfit-medium",
+    color: Colors.primary,
+  },
+  divider: { height: "100%", width: 1, backgroundColor: Colors.gray },
+
+  // ScrollView styles
+  scrollView: { backgroundColor: "#fff" },
+
+  // Carousel styles
   carouselContainer: {
     height: (height - 20) / 2.5,
     marginHorizontal: Spacing,
@@ -706,15 +759,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
   },
-  carousel: {
-    width: "100%",
-    height: "100%",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 20,
-  },
+  carousel: { width: "100%", height: "100%" },
+  carouselImage: { width: "100%", height: "100%", borderRadius: 20 },
   dotStyle: {
     width: 30,
     height: 3,
@@ -722,27 +768,144 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
     borderRadius: 3,
   },
-  activeDotStyle: {
-    backgroundColor: "white",
+  activeDotStyle: { backgroundColor: "white" },
+
+  // Content container styles
+  contentContainer: { padding: Spacing },
+
+  // Header styles
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing,
+  },
+  categoryButton: {
+    ...shared.button,
+    borderColor: Colors.gray,
+    borderWidth: 1,
+  },
+  categoryButtonText: {
+    color: Colors.primary,
+    fontFamily: "outfit-medium",
+  },
+  favoriteButton: {
+    backgroundColor: Colors.primary_10,
+    borderRadius: Spacing * 0.8,
+    padding: Spacing,
+  },
+
+  // Dish details styles
+  dishName: {
+    fontSize: FontSize.large,
+    fontFamily: "outfit-medium",
+    marginBottom: Spacing,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing,
+  },
+  ratingText: {
+    marginHorizontal: Spacing * 0.4,
+    fontSize: FontSize.small,
+    fontFamily: "outfit-bold",
+    color: Colors.gray,
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing,
+  },
+  currentPrice: {
+    marginHorizontal: Spacing * 0.4,
+    fontSize: FontSize.small,
+    fontFamily: "outfit-bold",
+  },
+  originalPrice: {
+    marginHorizontal: Spacing * 0.4,
+    fontSize: FontSize.small,
+    fontFamily: "outfit-medium",
+    textDecorationLine: "line-through",
+    color: Colors.primary,
+  },
+  description: { fontFamily: "outfit-regular", marginBottom: Spacing },
+
+  // Options styles
+  optionGroupTitle: {
+    fontFamily: "outfit-medium",
+    fontSize: FontSize.medium,
+    marginVertical: Spacing,
+  },
+  optionalText: {
+    fontFamily: "outfit-regular",
+    color: Colors.gray,
+  },
+  optionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  optionDetails: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: Spacing * 0.8,
+    marginLeft: Spacing,
+  },
+  optionName: { fontFamily: "outfit-regular" },
+  optionPrice: { fontFamily: "outfit-regular" },
+
+  // Quantity styles
+  quantityTitle: {
+    fontFamily: "outfit-medium",
+    fontSize: FontSize.medium,
+    marginVertical: Spacing,
+  },
+  quantityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing,
   },
   changeQuantity: {
     width: 26,
     height: 26,
     borderRadius: Spacing * 0.8,
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
-  signInButton: {
+  quantityMinus: { backgroundColor: Colors.primary_10 },
+  quantityPlus: { backgroundColor: Colors.primary },
+  quantityInput: {
+    fontFamily: "outfit-medium",
+    width: 50,
+    paddingHorizontal: Spacing * 0.4,
+    textAlign: "center",
+  },
+
+  // Total price and Add to Cart button
+  totalPrice: {
+    fontFamily: "outfit-bold",
+    fontSize: FontSize.large,
+    padding: Spacing * 0.6,
+  },
+  addToCartButton: {
     padding: Spacing * 1.6,
     backgroundColor: Colors.primary,
     marginTop: Spacing * 2,
     borderRadius: Spacing,
+    marginBottom: Spacing,
   },
-  signInText: {
+  addToCartText: {
     fontFamily: "outfit-bold",
     textAlign: "center",
     color: Colors.white,
     fontSize: FontSize.medium,
+  },
+  flexBetween: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

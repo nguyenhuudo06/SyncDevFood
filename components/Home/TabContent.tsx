@@ -23,9 +23,9 @@ const CategoryItem = () => {
       redirectUrl: "../(blog)/blogList",
     },
     {
-      name: "News",
-      icon: "newspaper-o",
-      redirectUrl: "../(tabs)/home",
+      name: "Order",
+      icon: "truck",
+      redirectUrl: "../(account)/order",
     },
   ];
 
@@ -39,7 +39,6 @@ const CategoryItem = () => {
               activeIndex === index && styles.activeContainer,
             ]}
             onPress={() => router.push(item.redirectUrl)}
-            // onPress={() => setActiveIndex(index)}
           >
             <Icon
               name={item.icon}
@@ -49,8 +48,8 @@ const CategoryItem = () => {
           </TouchableOpacity>
           <Text
             style={[styles.itemText]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
+            // numberOfLines={1}
+            // ellipsizeMode="tail"
           >
             {item.name}
           </Text>
@@ -91,9 +90,8 @@ const styles = StyleSheet.create({
   itemText: {
     marginTop: 5,
     textAlign: "center",
-    maxWidth: 80, // Giới hạn chiều rộng cho tên danh mục
-    overflow: "hidden",
     color: "#000", // Màu chữ mặc định
+    fontFamily: "outfit-medium"
   },
   activeText: {
     color: "#fff", // Màu chữ khi active

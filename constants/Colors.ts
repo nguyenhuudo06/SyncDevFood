@@ -12,6 +12,7 @@ export default {
   dark: dark,
   text: black,
   background: white,
+  backgroundBox: "#FAF6F3",
   primary: "#81C784",
   primary_10: "#81C7841A",
   primary_20: "#81C7842A",
@@ -25,5 +26,5 @@ export default {
   addressGray: "#BFC3BF2A",
   white: white,
   description: description,
-  danger: "#EB3223"
+  danger: "#EB3223",
 };

@@ -148,7 +148,7 @@ const ProductList = () => {
                       fontFamily: "outfit-bold",
                     }}
                   >
-                    {item?.rating ?? "No ratings"}
+                    {item?.rating?.toFixed(2) ?? "No ratings"}
                   </Text>
                 </View>
                 <View
@@ -162,7 +162,7 @@ const ProductList = () => {
                   <Image
                     source={{ uri: item?.thumbImage }}
                     resizeMode="cover"
-                    style={{ width: "100%", height: 80 }}
+                    style={{ width: "100%", height: 120 }}
                   />
                 </View>
                 <View style={{}}>
@@ -192,20 +192,11 @@ const ProductList = () => {
                   </Text>
                   <View
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      position: "absolute",
+                      top: Spacing * 5,
+                      right: 0,
                     }}
                   >
-                    <Text
-                      style={{
-                        fontFamily: "outfit-bold",
-                        color: Colors.orange,
-                        fontSize: FontSize.small,
-                      }}
-                    >
-                      VND
-                    </Text>
                     <View>
                       <AntDesign
                         name="pluscircle"
@@ -224,7 +215,7 @@ const ProductList = () => {
                         paddingTop: Spacing * 0.4,
                       }}
                     >
-                      {formatCurrency(100000000.99)}
+                      {formatCurrency(item.price)} VND
                     </Text>
                   </View>
                 </View>
@@ -235,7 +226,7 @@ const ProductList = () => {
           onEndReached={loadMoreFc}
           onEndReachedThreshold={0.5}
           ListFooterComponent={() => (
-            <View style={{ padding: Spacing, alignItems: "center" }}>
+            <View style={{ padding: Spacing, alignItems: "center", marginBottom: Spacing * 6 }}>
               <Text style={{ fontFamily: "outfit-medium", color: Colors.gray }}>
                 End of List
               </Text>

@@ -45,12 +45,15 @@ export const orderSlice = createSlice({
 
       const totalQuantity = state.carts.reduce((total, cartItem) => {
         if (cartItem.dishId === item.dishId) {
-          return total + cartItem.quantity;
+          return Number(total) + Number(cartItem.quantity);
         }
         return total;
       }, 0);
 
-      if (totalQuantity + item.quantity > item.availableQuantity) {
+      if (
+        Number(totalQuantity) + Number(item.quantity) >
+        Number(item.availableQuantity)
+      ) {
         state.status = "error";
         state.error = `Total number of products in cart (${totalQuantity}) and the quantity you want to add (${item.quantity}) exceed the available quantity (${item.availableQuantity}).`;
         return;
@@ -64,7 +67,9 @@ export const orderSlice = createSlice({
       );
 
       if (existingItemIndex > -1) {
-        state.carts[existingItemIndex].quantity += item.quantity;
+        state.carts[existingItemIndex].quantity =
+          Number(state.carts[existingItemIndex].quantity) +
+          Number(item.quantity);
       } else {
         state.carts.push(item);
       }

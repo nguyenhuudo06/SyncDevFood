@@ -101,7 +101,7 @@ const BlogList = () => {
                 styles.dropShadow,
                 { padding: Spacing, marginBottom: Spacing },
               ]}
-              onPress={() => {}}
+              onPress={() => router.push(`../../(blog)/blogId/${item.id}`)}
             >
               {/* Image */}
               <View

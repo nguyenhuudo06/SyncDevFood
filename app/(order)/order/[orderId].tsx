@@ -12,10 +12,14 @@ import HeaderPage from "@/components/HeaderPage/HeaderPage";
 import { useRoute } from "@react-navigation/native";
 import Colors from "@/constants/Colors";
 import FontSize from "@/constants/FontSize";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { callCancelOrderByOrderId } from "@/services/api-call";
+import Toast from "react-native-toast-message";
+import Loading from "@/components/Loading/Loading";
 
 const OrderId = () => {
   const route = useRoute();
+  const [loading, setLoading] = useState(false);
   const { orderId } = route.params;
   const [imageErrorMap, setImageErrorMap] = useState<Record<string, boolean>>(
     {}
@@ -42,6 +46,41 @@ const OrderId = () => {
     }));
   };
 
+  const handleCancelOrderByOrderId = async () => {
+    setLoading(true);
+    try {
+      const response = await callCancelOrderByOrderId(
+        parsedOrderDetails.orderId || ""
+      );
+
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error("Request failed with status " + response.status);
+      }
+
+      Toast.show({
+        type: "customToast",
+        text1: "Canceled succesfully!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+
+      router.push("../../(account)/order");
+    } catch (error) {
+      console.error("Error fetching order data:", error);
+
+      Toast.show({
+        type: "customToast",
+        text1: "Failed to cancel!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <Loading />;
+
   return (
     <View style={styles.container}>
       <HeaderPage titlePage="Order details" />
@@ -50,7 +89,7 @@ const OrderId = () => {
         <View style={{ marginBottom: Spacing }}>
           <View style={[styles.flexStart, { marginBottom: Spacing }]}>
             <Text style={[styles.title, { marginRight: Spacing }]}>
-              Delivery Info
+              Order code
             </Text>
             <TouchableOpacity style={styles.button}>
               <Text style={styles.title_2_noMargin}>
@@ -58,6 +97,28 @@ const OrderId = () => {
               </Text>
             </TouchableOpacity>
           </View>
+
+          <View style={[styles.flexStart, { marginBottom: Spacing }]}>
+            <Text style={[styles.title, { marginRight: Spacing }]}>Status</Text>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                parsedOrderDetails.orderStatus === "CANCELED" &&
+                  styles.buttonCancel,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.title_2_noMargin,
+                  parsedOrderDetails.orderStatus === "CANCELED" &&
+                    styles.title_2_noMarginCancel,
+                ]}
+              >
+                {parsedOrderDetails.orderStatus}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.flexStart}>
             <View style={{ marginRight: Spacing }}>
               <Text style={styles.title_2}>Exact location:</Text>
@@ -65,7 +126,6 @@ const OrderId = () => {
               <Text style={styles.title_2}>State:</Text>
               <Text style={styles.title_2}>City:</Text>
               <Text style={styles.title_2}>Phone:</Text>
-              <Text style={styles.title_2}>Status:</Text>
               <Text style={styles.title_2}>Email:</Text>
               <Text style={styles.title_2}>Order Date:</Text>
             </View>
@@ -83,9 +143,6 @@ const OrderId = () => {
                 {parsedOrderDetails.address.city}
               </Text>
               <Text style={styles.title_2}>{parsedOrderDetails.userEmail}</Text>
-              <Text style={styles.title_2}>
-                {parsedOrderDetails.orderStatus}
-              </Text>
               <Text style={styles.title_2}>{parsedOrderDetails.userEmail}</Text>
               <Text style={styles.title_2}>
                 {new Date(parsedOrderDetails.createdAt).toLocaleDateString(
@@ -98,28 +155,33 @@ const OrderId = () => {
 
         {/* Action */}
         <View style={{ marginBottom: Spacing }}>
-          <View style={styles.flexEnd}>
-            <TouchableOpacity>
-              <Text
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: Colors.danger,
-                    color: Colors.white,
-                    fontFamily: "outfit-bold",
-                  },
-                ]}
-              >
-                Cancell the order
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {parsedOrderDetails.orderStatus !== "CANCELED" && (
+            <View style={styles.flexEnd}>
+              <TouchableOpacity onPress={() => handleCancelOrderByOrderId()}>
+                <Text
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: Colors.danger,
+                      color: Colors.white,
+                      fontFamily: "outfit-bold",
+                    },
+                  ]}
+                >
+                  Cancel the order
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Products */}
         <View style={{ marginBottom: Spacing }}>
           {parsedOrderItems.map((product) => (
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                router.push(`../../(product)/product/${product?.dishId}`)
+              }
               key={product.itemId}
               style={{
                 flexDirection: "row",
@@ -203,7 +265,7 @@ const OrderId = () => {
                   </Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -251,6 +313,10 @@ const styles = StyleSheet.create({
     width: "auto",
     textAlign: "center",
   },
+  buttonCancel: {
+    backgroundColor: Colors.danger,
+  },
+  title_2_noMarginCancel: { color: Colors.white },
   dropShadow: {
     borderRadius: Spacing * 0.8,
     backgroundColor: Colors.white,

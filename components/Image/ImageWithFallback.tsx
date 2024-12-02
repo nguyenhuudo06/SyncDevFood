@@ -1,3 +1,4 @@
+import Colors from "@/constants/Colors";
 import Spacing from "@/constants/Spacing";
 import React, { useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
@@ -21,6 +22,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+    backgroundColor: Colors.primary_10
   },
 });
 

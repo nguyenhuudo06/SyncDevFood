@@ -39,6 +39,7 @@ import { doClearCartAction } from "@/redux/orderSlice/orderSlice";
 import { setPaymentUrl } from "@/redux/paymentUrlSlice/paymentUrlSlice";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
 import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
+import { resetCoupon } from "@/redux/couponSlice/couponSlice";
 
 interface Coupon {
   couponId: string;
@@ -124,6 +125,8 @@ const Checkout = () => {
   );
   const [bottomModalAndTitle, setBottomModalAndTitle] = useState(false);
 
+  const reduxCoupon = useSelector((state: RootState) => state.coupon);
+
   const selectedAddressUi = addresses.find(
     (item) => item.id === selectedAddress
   );
@@ -146,7 +149,7 @@ const Checkout = () => {
 
   const orderInformation: OrderInformation = {
     addressId: selectedAddress,
-    couponId: null,
+    couponId: reduxCoupon?.couponId || null,
     items: checkoutItems ?? [],
     note: "",
     paymentMethod: paymentMethod,
@@ -159,20 +162,29 @@ const Checkout = () => {
     duration: "0 m",
   });
 
-  // console.log("selectedAddress: ", addresses);
-  // console.log(orderSummary);
-  // console.log(checkoutItems);
-  // console.log(orderInformation);
-
   const calculateSubtotal = () => {
     return cartItems.reduce(
       (total, item) => total + item.detail.price * item.quantity,
       0
     );
   };
+
+  const calculateDiscount = (subtotal: number, reduxCoupon) => {
+    if (subtotal < reduxCoupon.minOrderValue) return 0;
+
+    const discountAmount = subtotal * (reduxCoupon.discountPercent / 100);
+
+    const finalDiscount =
+      discountAmount > reduxCoupon.maxDiscount
+        ? reduxCoupon.maxDiscount
+        : discountAmount;
+    return finalDiscount;
+  };
+
+  const subtotal = calculateSubtotal();
+  const discount = calculateDiscount(subtotal, reduxCoupon);
+
   const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const discount = appliedCoupon ? appliedCoupon.discountAmount : 0;
     return subtotal - discount + orderSummary.delivery;
   };
 
@@ -253,7 +265,7 @@ const Checkout = () => {
     }
   };
 
-  // Quản lý state
+  // Quản lý state selected address
   const handleAddressSelect = (addressId: string) => {
     setSelectedAddress(addressId);
     setBottomModalAndTitle(false);
@@ -320,12 +332,15 @@ const Checkout = () => {
       console.error("Payment error:", error);
     } finally {
       setLoading(false);
+      dispatch(resetCoupon());
     }
   };
 
   const formatPrice = (price: number) => {
-    return Math.round(price).toLocaleString("vi-VN");
+    return price.toLocaleString("vi-VN");
   };
+
+  console.log("Data: ", subtotal, discount, reduxCoupon);
 
   return (
     <>
@@ -622,10 +637,7 @@ const Checkout = () => {
                       marginBottom: Spacing,
                     }}
                   >
-                    {appliedCoupon
-                      ? formatPrice(appliedCoupon.discountAmount)
-                      : 0}{" "}
-                    VND
+                    {formatPrice(discount)} VND
                   </Text>
                 </View>
                 <View

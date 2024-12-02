@@ -10,12 +10,13 @@ import {
   TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
+import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
 import ProductList from "@/components/Product/ProductList";
 import BackButton from "@/components/Material/BackButton";
 import FontSize from "@/constants/FontSize";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { AntDesign, EvilIcons, Feather } from "@expo/vector-icons";
 import { formatCurrency } from "@/utils/currency";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -29,6 +30,7 @@ import {
 import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
+import { setCoupon } from "@/redux/couponSlice/couponSlice";
 
 interface Coupon {
   couponId: string;
@@ -43,31 +45,18 @@ interface Coupon {
   expirationDate: string;
 }
 
-interface AppliedCoupon extends Coupon {
-  discountAmount: number;
-}
-
-interface OrderSummary {
-  subtotal: number;
-  delivery: number;
-  discount: number;
-  total: number;
-  appliedCoupon: AppliedCoupon | null;
-}
-
 const Cart2 = () => {
+  const [showCoupondModal, setShowCoupondModal] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const orderState = useSelector((state: RootState) => state.order);
   const cartItems = useSelector((state: RootState) => state.order.carts);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
-    null
-  );
-  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const userId = useSelector((state: RootState) => state.auth.user_id);
+
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
+  // console.log("coupons: ", coupons);
 
   const fetchCoupons = async () => {
     try {
@@ -185,9 +174,29 @@ const Cart2 = () => {
     );
   };
 
+  const calculateDiscount = (subtotal: number, appliedCoupon) => {
+    const couponFound = coupons.find(
+      (coupon) => coupon.couponId === appliedCoupon
+    );
+    if (couponFound == undefined) return 0;
+
+    if (subtotal < couponFound.minOrderValue) return 0;
+
+    const discountAmount = subtotal * (couponFound.discountPercent / 100);
+
+    const finalDiscount =
+      discountAmount > couponFound.maxDiscount
+        ? couponFound.maxDiscount
+        : discountAmount;
+    return finalDiscount;
+  };
+
+  const subtotal = calculateSubtotal();
+  const discount = calculateDiscount(subtotal, appliedCoupon);
+  // console.log("subtotal: ", subtotal);
+  // console.log("discount: ", discount);
+
   const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const discount = appliedCoupon ? appliedCoupon.discountAmount : 0;
     return subtotal - discount;
   };
 
@@ -204,9 +213,20 @@ const Cart2 = () => {
     router.push("../(task)/checkout");
   };
 
-  const handleInputBlur = () => {
-    console.log("sdkfmlsd");
+  const setReduxCoupon = async (coupon) => {
+    console.log(coupon);
+
+    dispatch(
+      setCoupon({
+        couponCode: coupon.couponCode,
+        couponId: coupon.couponId,
+        discountPercent: coupon.discountPercent,
+        maxDiscount: coupon.maxDiscount,
+        minOrderValue: coupon.minOrderValue,
+      })
+    );
   };
+
 
   return (
     <ScrollView style={styles.scrollView}>
@@ -214,33 +234,36 @@ const Cart2 = () => {
 
       <View style={styles.spacing}>
         {cartItems.length == 0 && (
-          <TouchableOpacity
-            onPress={() => router.replace("./home")}
-            style={{
-              backgroundColor: Colors.primary_10,
-              padding: Spacing * 0.4,
-              paddingHorizontal: Spacing,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: Spacing * 0.8,
-              marginBottom: Spacing,
-            }}
-          >
-            <AntDesign
-              name="plus"
-              size={FontSize.small}
-              color={Colors.primary}
-            />
-            <Text
+          <>
+            <TouchableOpacity
+              onPress={() => router.replace("./home")}
               style={{
-                fontFamily: "outfit-medium",
-                marginLeft: Spacing * 0.8,
+                backgroundColor: Colors.primary_10,
+                padding: Spacing * 0.4,
+                paddingHorizontal: Spacing,
+                paddingVertical: Spacing,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: Spacing * 0.8,
+                marginBottom: Spacing,
               }}
             >
-              Add some dish
-            </Text>
-          </TouchableOpacity>
+              <AntDesign
+                name="plus"
+                size={FontSize.small}
+                color={Colors.primary}
+              />
+              <Text
+                style={{
+                  fontFamily: "outfit-medium",
+                  marginLeft: Spacing * 0.8,
+                }}
+              >
+                Add some dish
+              </Text>
+            </TouchableOpacity>
+          </>
         )}
 
         {cartItems.map((item) => (
@@ -266,7 +289,7 @@ const Cart2 = () => {
               onPress={(e) => {
                 e.stopPropagation();
                 console.log("hhhh");
-                handleRemoveItem(item.dishId, item.selectedOptions)
+                handleRemoveItem(item.dishId, item.selectedOptions);
               }}
               style={[styles.absoluteDeleleIcon]}
             >
@@ -422,6 +445,32 @@ const Cart2 = () => {
           </View>
         ))}
 
+        {cartItems.length > 0 && (
+          <TouchableOpacity
+            onPress={async () => {
+              if (!isAuthenticated) {
+                router.push("../(auth)/login");
+                return;
+              }
+              await setShowCoupondModal((prev) => !prev);
+            }}
+            style={[
+              styles.dropShadow,
+
+              { padding: Spacing, marginBottom: Spacing, overflow: "hidden" },
+            ]}
+          >
+            <View>
+              <Text
+                style={{ textAlign: "center", fontFamily: "outfit-medium" }}
+              >
+                Select coupond
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* Modal information */}
         <View
           style={{
             padding: Spacing,
@@ -430,41 +479,6 @@ const Cart2 = () => {
             backgroundColor: Colors.primary,
           }}
         >
-          <View
-            style={{
-              backgroundColor: Colors.white,
-              padding: Spacing * 0.6,
-              borderRadius: 30,
-              marginBottom: Spacing * 2,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                paddingHorizontal: Spacing,
-                color: Colors.primary,
-                fontFamily: "outfit-medium",
-              }}
-              placeholder="Coupon code"
-            />
-            <TouchableOpacity>
-              <Text
-                style={{
-                  paddingHorizontal: Spacing * 1.5,
-                  paddingVertical: Spacing * 0.6,
-                  borderRadius: Spacing * 3,
-                  backgroundColor: Colors.primary,
-                  color: Colors.white,
-                  fontFamily: "outfit-medium",
-                }}
-              >
-                Apply
-              </Text>
-            </TouchableOpacity>
-          </View>
-
           <View
             style={{
               flexDirection: "row",
@@ -507,33 +521,6 @@ const Cart2 = () => {
                 fontFamily: "outfit-medium",
               }}
             >
-              Delivery
-            </Text>
-            <Text
-              style={{
-                color: Colors.white,
-                fontSize: FontSize.medium,
-                fontFamily: "outfit-regular",
-              }}
-            >
-              0 VND
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingVertical: Spacing * 0.4,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.white,
-                fontSize: FontSize.medium,
-                fontFamily: "outfit-medium",
-              }}
-            >
               Discount
             </Text>
             <Text
@@ -543,8 +530,7 @@ const Cart2 = () => {
                 fontFamily: "outfit-regular",
               }}
             >
-              {appliedCoupon ? formatPrice(appliedCoupon.discountAmount) : 0}{" "}
-              VND
+              {formatPrice(discount)} VND
             </Text>
           </View>
           <View
@@ -581,13 +567,85 @@ const Cart2 = () => {
             <Text style={styles.signInText}>Check out</Text>
           </TouchableOpacity>
         </View>
-
-        <View
-          style={{ marginTop: Spacing, padding: Spacing, marginBottom: 40 }}
-        >
-          {/* <Coupon couponResponseList={coupons} /> */}
-        </View>
       </View>
+
+      <BottomModal
+        visible={showCoupondModal}
+        onTouchOutside={() => setShowCoupondModal(false)}
+        overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
+        height={0.8}
+        width={1}
+        onSwipeOut={() => setShowCoupondModal(false)}
+      >
+        <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
+          <ScrollView contentContainerStyle={{ flex: 1 }}>
+            {coupons.length > 0 ? (
+              coupons.map((item) => (
+                <View
+                  key={item.couponId}
+                  style={[
+                    {
+                      padding: Spacing * 0.4,
+                      marginBottom: Spacing,
+                    },
+                  ]}
+                >
+                  <TouchableOpacity
+                    // disabled={true}
+                    onPress={async () => {
+                      await setAppliedCoupon(item.couponId || null);
+                      await setShowCoupondModal(false);
+                      await setReduxCoupon(item);
+                    }}
+                    style={[
+                      styles.dropShadow,
+                      { padding: Spacing, overflow: "hidden" },
+                    ]}
+                  >
+                    {appliedCoupon == item.couponId && (
+                      <View style={styles.triangle} />
+                    )}
+                    <Text
+                      style={[
+                        styles.couponContent,
+                        {
+                          fontFamily: "outfit-bold",
+                          fontSize: FontSize.medium,
+                        },
+                      ]}
+                    >
+                      #{item.couponCode}{" "}
+                      <Text style={[styles.couponQuantity]}>
+                        X {item.availableQuantity}
+                      </Text>
+                    </Text>
+                    <Text style={[styles.couponContent]}>
+                      Sale up to {item.discountPercent}% off (Max{" "}
+                      {item.maxDiscount}) VNĐ
+                    </Text>
+                    <Text style={[styles.couponContent]}>
+                      Applicable for minimum order {item.minOrderValue} VNĐ
+                    </Text>
+                    <Text style={[styles.couponContent]}>
+                      {item.startDate
+                        ? new Date(item.startDate).toLocaleDateString("vi-VN")
+                        : "N/A"}{" "}
+                      -{" "}
+                      {item.expirationDate
+                        ? new Date(item.expirationDate).toLocaleDateString(
+                            "vi-VN"
+                          )
+                        : "N/A"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            ) : (
+              <Text>No coupond available</Text>
+            )}
+          </ScrollView>
+        </ModalContent>
+      </BottomModal>
     </ScrollView>
   );
 };
@@ -595,6 +653,41 @@ const Cart2 = () => {
 export default Cart2;
 
 const styles = StyleSheet.create({
+  triangle: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: Spacing * 2, // Chiều rộng của cạnh vuông
+    borderTopWidth: Spacing * 2, // Chiều cao của cạnh vuông
+    borderLeftColor: "transparent", // Giấu phần bên trái của tam giác
+    borderTopColor: "blue", // Màu của phần cạnh vuông
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  flexBetween: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  couponContent: {
+    fontFamily: "outfit-medium",
+  },
+  couponQuantity: {
+    fontFamily: "outfit-bold",
+    fontSize: FontSize.medium,
+    color: Colors.primary,
+  },
+  dropShadow: {
+    borderRadius: Spacing * 0.8,
+    backgroundColor: Colors.white,
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
   scrollView: {
     backgroundColor: "#fff",
   },

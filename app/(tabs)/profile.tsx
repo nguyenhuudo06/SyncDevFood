@@ -55,7 +55,7 @@ const Profile = () => {
                 <View style={styles.profileImageBackground}>
                   <ImageWithFallback
                     source={{ uri: userData.user_avatar }}
-                    fallbackSource={require("../../assets/images/pngegg.png")}
+                    fallbackSource={require("../../assets/images/avatar-png.png")}
                     style={styles.profileImage}
                     resizeMode="cover"
                   />
@@ -242,6 +242,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.gray
   },
   profileImage: {
     width: "100%",
@@ -256,6 +258,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 50,
     padding: 8,
+    borderWidth: 1,
+    borderColor: Colors.gray
   },
   name: {
     fontSize: 24,

@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
 
 interface Option {
@@ -81,7 +80,6 @@ const Order = () => {
   const [orderData, setOrderData] = useState<OrderResponse[] | []>([]);
   const userId = useSelector((state: RootState) => state.auth.user_id);
 
-  console.log(orderData)
 
   const fetchOrders = async (page = 0) => {
     const pageSize = 6;

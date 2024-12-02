@@ -191,6 +191,30 @@ export const callAddAddress = (
   });
 };
 
+export const callUpdateAddress = (
+  street: string,
+  country: string,
+  city: string,
+  addressType: string,
+  state: string,
+  commune: string,
+  phoneNumber: string,
+  userId: string | null,
+  id: string | null
+) => {
+  return instance.put("/api/v1/client/address/update", {
+    street,
+    country,
+    city,
+    addressType,
+    state,
+    commune,
+    phoneNumber,
+    userId,
+    id,
+  });
+};
+
 export const callGetAllOffers = async () => {
   return instance.get(`/api/v1/auth/guest/get-all-offers`);
 };
@@ -205,4 +229,66 @@ export const callUpdateAvatar = (file: FormData) => {
       "Content-Type": "multipart/form-data",
     },
   });
+};
+
+export const callGetReviewsByDishId = async (dishId: string, query: string) => {
+  return instance.get(
+    `/api/v1/auth/guest/get-all-reviews-by-dish?dishId=${dishId}&${query}`
+  );
+};
+
+export const callAllDishToSearch = async () => {
+  return instance.get(`/api/v1/dashboard/dish/get-all-dishes-to-search`);
+};
+
+export const callAddDishToWishList = async (
+  dishId: string | undefined,
+  userId: string | null
+) => {
+  return instance.post(
+    `/api/v1/client/wishlist/add-dish-to-wishlist?dishId=${dishId}&userId=${userId}`
+  );
+};
+
+export const callDeleteDishFromWishList = async (
+  dishId: string | undefined,
+  userId: string | null
+) => {
+  return instance.delete(
+    `/api/v1/client/wishlist/remove-dish-from-wishlist?dishId=${dishId}&userId=${userId}`
+  );
+};
+
+export const callCreateReview = async (
+  dishId: string,
+  rating: number,
+  review: string,
+  userId: string | null
+) => {
+  return instance.post(`/api/v1/client/review/create-review`, {
+    dishId: dishId,
+    rating: rating,
+    review: review,
+    userId: userId,
+  });
+};
+
+export const callGetReviewsByUserId = async (userId: string, query: string) => {
+  return instance.get(
+    `/api/v1/client/review/get-all-reviews-by-user-id?userId=${userId}&${query}`
+  );
+};
+
+export const callCancelOrderByOrderId = async (orderId: string) => {
+  return instance.put(`/api/v1/client/order/cancel-order?orderId=${orderId}`);
+};
+
+export const callGetBlogById = async (blogId: string) => {
+  return instance.get(`/api/v1/auth/guest/get-blog-by-id?blogId=${blogId}`);
+};
+
+export const callGetAllCategories = async () => {
+  return instance.get(
+    `/api/v1/auth/guest/get-all-categories?sortBy=createdAt&sortDir=asc`
+  );
 };

@@ -21,6 +21,7 @@ import {
   callDeleteAddress,
   callDistrictService,
   callProvincialService,
+  callUpdateAddress,
 } from "@/services/api-call";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
 import { Dropdown as DropdownLib } from "react-native-element-dropdown";
@@ -64,8 +65,8 @@ const Address = () => {
   });
   const [phoneNumber, setPhoneNumber] = useState("");
   const [addressType, setAddressType] = useState("home");
-
-  console.log("address data form: ", address, phoneNumber, addressType, userId);
+  const [formType, setFormType] = useState<"UPDATE" | "CREATE">("CREATE");
+  const [addressUpdateId, setAddressUpdateId] = useState<string | null>(null);
 
   const fetchAddNewAddress = async () => {
     try {
@@ -101,6 +102,8 @@ const Address = () => {
       setPhoneNumber("");
       setAddressType("home");
       setShowAddressForm(false);
+
+      fetchAddress();
     } catch (error) {
       Toast.show({
         type: "customToast",
@@ -111,7 +114,54 @@ const Address = () => {
     }
   };
 
-  const handleAddNewAddress = () => {
+  const fetchUpdateAddress = async (id: string | null) => {
+    try {
+      const responseProvince = await callUpdateAddress(
+        address.specificAddress,
+        "Việt Nam",
+        address.province,
+        addressType,
+        address.district,
+        address.ward,
+        phoneNumber,
+        userId,
+        id
+      );
+
+      if (responseProvince.status < 200 || responseProvince.status >= 300) {
+        throw new Error(
+          "Request failed with status " + responseProvince.status
+        );
+      }
+
+      Toast.show({
+        type: "customToast",
+        text1: "Address updated successful!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+      setAddress({
+        province: "",
+        district: "",
+        ward: "",
+        specificAddress: "",
+      });
+      setPhoneNumber("");
+      setAddressType("home");
+      setShowAddressForm(false);
+
+      fetchAddress();
+    } catch (error) {
+      Toast.show({
+        type: "customToast",
+        text1: "Cannot update address!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
+    }
+  };
+
+  const handleAddNewAddress = (id: string | null) => {
     if (
       !address.province ||
       !address.district ||
@@ -128,7 +178,7 @@ const Address = () => {
         visibilityTime: 1800,
       });
     } else {
-      fetchAddNewAddress();
+      formType == "CREATE" ? fetchAddNewAddress() : fetchUpdateAddress(id);
     }
   };
 
@@ -228,8 +278,9 @@ const Address = () => {
         <>
           <View style={styles.spacing}>
             <TouchableOpacity
-              onPress={() => {
-                setShowAddressForm(true);
+              onPress={async () => {
+                await setShowAddressForm(true);
+                await setFormType("CREATE");
               }}
               style={{
                 backgroundColor: Colors.primary_10,
@@ -303,6 +354,11 @@ const Address = () => {
                       </View>
 
                       <TouchableOpacity
+                        onPress={async () => {
+                          await setShowAddressForm(true);
+                          await setFormType("UPDATE");
+                          await setAddressUpdateId(item.id);
+                        }}
                         style={{
                           padding: Spacing * 0.6,
                           backgroundColor: Colors.primary_10,
@@ -538,10 +594,12 @@ const Address = () => {
             <View style={styles.buttonsContainer}>
               <TouchableOpacity
                 style={styles.applyButton}
-                onPress={() => handleAddNewAddress()}
+                onPress={() => handleAddNewAddress(addressUpdateId)}
               >
                 <Feather name="save" size={Spacing * 2} color={Colors.white} />
-                <Text style={styles.buttonText}>Apply</Text>
+                <Text style={styles.buttonText}>
+                  {formType == "CREATE" ? "Create" : "Update"}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setShowAddressForm(false)}

@@ -103,7 +103,6 @@ const ChangePassword = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <HeaderPage titlePage="Change Password" />
         <View style={{ padding: Spacing }}>
@@ -309,17 +308,12 @@ const ChangePassword = () => {
           </Formik>
         </View>
       </ScrollView>
-    </SafeAreaView>
   );
 };
 
 export default ChangePassword;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
   scrollView: {
     backgroundColor: "#fff",
   },
