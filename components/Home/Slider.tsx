@@ -106,10 +106,10 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   sliderContainer: {
-    paddingHorizontal: Spacing * 2,
+    paddingHorizontal: Spacing,
   },
   image: {
-    width: Dimensions.get("window").width - Spacing * 4,
+    width: Dimensions.get("window").width - Spacing * 3,
     height: 160,
     marginRight: 10,
     resizeMode: "cover",

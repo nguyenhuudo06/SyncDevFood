@@ -10,6 +10,8 @@ import {
   ImageBackground,
   StatusBar,
   Alert,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import {
   AntDesign,
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: Colors.gray
+    borderColor: Colors.gray,
   },
   profileImage: {
     width: "100%",
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 8,
     borderWidth: 1,
-    borderColor: Colors.gray
+    borderColor: Colors.gray,
   },
   name: {
     fontSize: 24,

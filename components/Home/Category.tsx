@@ -3,10 +3,11 @@ import React from "react";
 import CategoryItem from "./CategoryItem";
 import TabContent from "./TabContent";
 import FontSize from "@/constants/FontSize";
+import Spacing from "@/constants/Spacing";
 
 const Category = () => {
   return (
-    <View style={{ paddingHorizontal: 20 }}>
+    <View style={{ paddingHorizontal: Spacing }}>
       <View
         style={{
           display: "flex",
@@ -20,12 +21,12 @@ const Category = () => {
           style={{
             fontSize: FontSize.medium,
             fontFamily: "outfit-bold",
+            width: "100%"
           }}
         >
           Explore
         </Text>
       </View>
-      {/* <CategoryItem /> */}
       <TabContent />
     </View>
   );

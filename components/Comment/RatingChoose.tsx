@@ -87,7 +87,7 @@ const StarRatingWithComment = ({ dishId }) => {
             <AntDesign
               name="star"
               size={Spacing * 2}
-              color={index < selectedStars ? "gold" : Colors.gray} // Đổi màu
+              color={index < selectedStars ? Colors.orange : Colors.gray} // Đổi màu
             />
           </TouchableOpacity>
         ))}

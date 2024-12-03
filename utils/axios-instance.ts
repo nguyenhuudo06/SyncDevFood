@@ -16,7 +16,7 @@ const instance = axios.create({
   },
 });
 
-// 2. Hàm lưu/xóa và lấy `accessToken` từ AsyncStorage
+// 2.1 Hàm lưu/xóa accessToken` từ AsyncStorage
 export const setAccessToken = async (token: string | null) => {
   if (token) {
     await AsyncStorage.setItem("accessToken", token); // Lưu token
@@ -25,6 +25,7 @@ export const setAccessToken = async (token: string | null) => {
   }
 };
 
+// 2.2 Hàm  lấy `accessToken` từ AsyncStorage
 export const getAccessToken = async () => {
   return await AsyncStorage.getItem("accessToken"); // Lấy token
 };

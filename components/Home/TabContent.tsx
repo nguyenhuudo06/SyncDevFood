@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { router } from "expo-router";
+import Colors from "@/constants/Colors";
 
 const CategoryItem = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -43,13 +44,13 @@ const CategoryItem = () => {
             <Icon
               name={item.icon}
               size={40}
-              color={activeIndex === index ? "#fff" : "#F76D02"}
+              color={activeIndex === index ? Colors.white : Colors.primary}
             />
           </TouchableOpacity>
           <Text
-            style={[styles.itemText]}
-            // numberOfLines={1}
-            // ellipsizeMode="tail"
+            style={[styles.itemText, { width: "100%" }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
           >
             {item.name}
           </Text>
@@ -85,13 +86,14 @@ const styles = StyleSheet.create({
     alignItems: "center", // Căn giữa hình ảnh
   },
   activeContainer: {
-    backgroundColor: "#F76D02",
+    backgroundColor: Colors.primary,
   },
   itemText: {
+    width: "100%",
     marginTop: 5,
     textAlign: "center",
     color: "#000", // Màu chữ mặc định
-    fontFamily: "outfit-medium"
+    fontFamily: "outfit-medium",
   },
   activeText: {
     color: "#fff", // Màu chữ khi active

@@ -7,14 +7,7 @@ import Toast, { BaseToast } from "react-native-toast-message";
 import { Provider } from "react-redux";
 import Spacing from "@/constants/Spacing";
 import store from "@/redux/store";
-import {
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -181,6 +174,8 @@ export default function RootLayout() {
               />
 
               <Stack.Screen name="(order)" options={{ headerShown: false }} />
+
+              <Stack.Screen name="index" options={{ headerShown: false }} />
             </Stack>
             <ModalPortal />
             <Toast config={toastConfig} />
@@ -194,6 +189,5 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: StatusBar.currentHeight,
   },
 });

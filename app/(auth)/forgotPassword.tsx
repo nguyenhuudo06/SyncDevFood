@@ -5,17 +5,16 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import Spacing from "@/constants/Spacing";
 import FontSize from "@/constants/FontSize";
 import Colors from "@/constants/Colors";
 import { TextInput } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { setAccessToken } from "@/utils/axios-instance";
 import Toast from "react-native-toast-message";
 import { callForgotPassword } from "@/services/api-call";
 
@@ -44,31 +43,31 @@ const ForgotPassword = () => {
       }
 
       Toast.show({
-        type: "success",
-        text1: "Successful!",
-        text2: "Check your email to change the password!",
+        type: "customToast",
+        text1: "Please check your email!",
         onPress: () => Toast.hide(),
       });
 
       setLoading(false);
 
-      // router.replace("../(tabs)/home");
+      router.replace("../(tabs)/home");
     } catch (error) {
       console.error(error);
 
       Toast.show({
-        type: "error",
-        text1: "Login failed!",
-        text2: error.response?.data?.errors.error || "Something wrong!",
+        type: "customToast",
+        text1: "Send email error!",
         onPress: () => Toast.hide(),
       });
 
+      setLoading(false);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <View style={styles.paddingView}>
           <View style={styles.titleContainer}>
@@ -117,7 +116,16 @@ const ForgotPassword = () => {
                     style={styles.sendButton}
                     onPress={() => handleSubmit()}
                   >
-                    <Text style={styles.buttonText}>Send verify email</Text>
+                    <Text style={styles.buttonText}>
+                      {loading ? (
+                        <ActivityIndicator
+                          size={Spacing * 1.6}
+                          color={Colors.white}
+                        />
+                      ) : (
+                        "Send verify email"
+                      )}
+                    </Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -133,7 +141,7 @@ const ForgotPassword = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -142,6 +150,7 @@ export default ForgotPassword;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: Colors.white,
   },
   scrollView: {
     flexGrow: 1,
@@ -179,12 +188,15 @@ const styles = StyleSheet.create({
     marginTop: Spacing,
   },
   showError: {
-    height: 20,
+    height: Spacing * 2.6,
   },
   errorText: {
-    color: "red",
+    color: Colors.danger,
+    marginTop: 5,
+    fontFamily: "outfit-regular",
   },
   sendButton: {
+    height: 68,
     padding: Spacing * 2,
     backgroundColor: Colors.primary,
     marginVertical: Spacing * 3,
@@ -202,7 +214,7 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-medium",
     textAlign: "center",
     color: Colors.onPrimary,
-    fontSize: FontSize.large,
+    fontSize: FontSize.medium,
   },
   navigationContainer: {
     flexDirection: "row",

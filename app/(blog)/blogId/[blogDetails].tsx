@@ -16,24 +16,41 @@ const BlogId = () => {
   const route = useRoute();
   const { blogDetails } = route.params;
   const [blogData, setBlogData] = useState(null);
+  const [webViewHeight, setWebViewHeight] = useState(0);
   // console.log("blogData: ", blogData?.content);
 
   const modifiedHtml = `
   <html>
     <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
         body {
-          font-size: 40px;
+          font-size: 16px;
           line-height: 1.6;
           font-family: "outfit-regular";
+          margin: 0;
+          padding: 0;
+          overflow-y: hidden; /* Ngăn cuộn bên trong WebView */
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
         }
       </style>
+      <script>
+        function sendHeight() {
+          const height = document.body.scrollHeight;
+          window.ReactNativeWebView.postMessage(height);
+        }
+        window.onload = sendHeight;
+        window.onresize = sendHeight;
+      </script>
     </head>
     <body>
       ${blogData?.content}
     </body>
   </html>
-`;
+  `;
 
   const fetchBlogData = async () => {
     try {
@@ -126,14 +143,27 @@ const BlogId = () => {
             </View>
           </View>
 
-          <View style={{ minHeight: 600, backgroundColor: "red" }}>
+          {/* <View style={{ flex: 1, minHeight: 600 }}>
             <WebView
               style={{ flex: 1 }}
               originWhitelist={["*"]}
               source={{ html: modifiedHtml }}
+              javaScriptEnabled={true} // Kích hoạt JavaScript
+              domStorageEnabled={true} // Kích hoạt lưu trữ DOM
             />
-          </View>
+          </View> */}
 
+          <WebView
+            style={{ width: "100%", height: webViewHeight }}
+            originWhitelist={["*"]}
+            source={{ html: modifiedHtml }}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            onMessage={(event) => {
+              const height = parseInt(event.nativeEvent.data, 10);
+              setWebViewHeight(height);
+            }}
+          />
         </ScrollView>
       )}
     </>

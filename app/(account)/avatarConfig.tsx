@@ -188,7 +188,12 @@ const AvatarConfig = () => {
       } else {
         console.error("Unknown error:", error);
       }
-      Alert.alert("Lỗi", "Không thể upload ảnh.");
+      Toast.show({
+        type: "customToast",
+        text1: "Cannot upload avatar!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1000,
+      });
     }
   };
 

@@ -227,7 +227,6 @@ const Cart2 = () => {
     );
   };
 
-
   return (
     <ScrollView style={styles.scrollView}>
       <HeaderPage titlePage="Cart" />
@@ -275,6 +274,7 @@ const Cart2 = () => {
               justifyContent: "space-between",
               paddingHorizontal: Spacing,
               paddingVertical: Spacing * 1.4,
+              paddingBottom: Spacing * 0.5,
               marginBottom: Spacing,
               borderRadius: Spacing * 0.8,
               backgroundColor: Colors.white,
@@ -282,6 +282,7 @@ const Cart2 = () => {
               shadowOpacity: 0.1,
               shadowRadius: 12,
               elevation: 5,
+              overflow: "hidden",
             }}
           >
             {/* Absolute delete button */}
@@ -321,9 +322,6 @@ const Cart2 = () => {
             <View
               style={{
                 flex: 1,
-                flexDirection: "row",
-                alignItems: "flex-end",
-                justifyContent: "space-between",
               }}
             >
               {/* Left */}
@@ -334,6 +332,7 @@ const Cart2 = () => {
                     width: "100%",
                     fontFamily: "outfit-medium",
                     fontSize: FontSize.medium,
+                    paddingRight: Spacing * 3
                   }}
                 >
                   {item.detail.dishName}
@@ -367,7 +366,6 @@ const Cart2 = () => {
                     style={{
                       width: "100%",
                       fontFamily: "outfit-medium",
-                      // color: Colors.primary,
                     }}
                   >
                     Total: {formatPrice(item.detail.price * item.quantity)} VND
@@ -375,7 +373,13 @@ const Cart2 = () => {
                 </View>
               </View>
               {/* Right */}
-              <View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end",
+                }}
+              >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <TouchableOpacity
                     onPress={() =>
@@ -396,7 +400,7 @@ const Cart2 = () => {
                       color={Colors.primary}
                     />
                   </TouchableOpacity>
-                  <TouchableOpacity>
+                  <View>
                     <TextInput
                       maxLength={4}
                       onChangeText={(value) =>
@@ -407,7 +411,7 @@ const Cart2 = () => {
                         )
                       }
                       onBlur={() => {
-                        handleInputBlur();
+                        // handleInputBlur();
                       }}
                       keyboardType="numeric"
                       numberOfLines={1}
@@ -419,7 +423,7 @@ const Cart2 = () => {
                         textAlign: "center",
                       }}
                     />
-                  </TouchableOpacity>
+                  </View>
                   <TouchableOpacity
                     onPress={() =>
                       handleUpdateQuantity(
@@ -477,6 +481,7 @@ const Cart2 = () => {
             paddingTop: Spacing * 1.6,
             borderRadius: Spacing * 0.8,
             backgroundColor: Colors.primary,
+            marginBottom: Spacing * 8,
           }}
         >
           <View

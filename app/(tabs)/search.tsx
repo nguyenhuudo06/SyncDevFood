@@ -28,7 +28,7 @@ import StarRating from "@/components/Comment/RatingSortType";
 const filterType = [
   { label: "A - Z", value: "ascName" },
   { label: "Z - A", value: "descName" },
-  { label: "Price low to high", value: "descPrice" },
+  { label: "Price low to high", value: "ascPrice" },
   { label: "Price high to low", value: "descPrice" },
 ];
 
@@ -85,10 +85,6 @@ const Search = () => {
     return price.toLocaleString("vi-VN");
   };
 
-  // const filteredProducts = products.filter((product) =>
-  //   product.dishName.toLowerCase().includes(searchText.toLowerCase())
-  // );
-
   const filteredProducts = products
     .filter((product) =>
       product.dishName.toLowerCase().includes(searchText.toLowerCase())
@@ -105,9 +101,9 @@ const Search = () => {
       } else if (selectedFilter === "descName") {
         return b.dishName.localeCompare(a.dishName);
       } else if (selectedFilter === "descPrice") {
-        return b.offerPrice - a.offerPrice;
+        return b.price - a.price;
       } else if (selectedFilter === "ascPrice") {
-        return a.offerPrice - b.offerPrice;
+        return a.price - b.price;
       }
       return 0;
     });
@@ -144,7 +140,7 @@ const Search = () => {
       >
         <TouchableOpacity style={{ flex: 1 }}>
           <LinearGradient
-            colors={["#FFF0F0", "#F76D02B5"]}
+            colors={[Colors.primary_20, Colors.primary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.searchBar}
@@ -207,6 +203,7 @@ const Search = () => {
                       {
                         fontSize: FontSize.medium,
                         lineHeight: FontSize.medium * 1.2,
+                        minHeight: FontSize.medium * 3
                       },
                     ]}
                   >
@@ -237,47 +234,16 @@ const Search = () => {
         visible={showFilterModal}
         onTouchOutside={() => setShowFilterModal(false)}
         overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
-        height={0.3}
+        height={0.5}
         width={1}
         onSwipeOut={() => setShowFilterModal(false)}
       >
         <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
           <View>
-            <View
-              style={[
-                {
-                  flexDirection: "row",
-                  gap: Spacing,
-                },
-              ]}
-            >
-              {/* <DropdownLib
-                style={[styles.dropdown, { flex: 1 }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={filterType}
-                labelField="label"
-                valueField="value"
-                placeholder={""}
-                value={""}
-                onChange={(item) => console.log("kkk")}
-                renderItem={renderItem}
-              />
+            <View>
+              <Text style={[styles.titleDropdownFilter]}>Sort by:</Text>
               <DropdownLib
-                style={[styles.dropdown, { flex: 1 }]}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={categoryType}
-                labelField="label"
-                valueField="value"
-                placeholder={""}
-                value={"all"}
-                onChange={(item) => console.log("kkk")}
-                renderItem={renderItem}
-              /> */}
-
-              <DropdownLib
-                style={[styles.dropdown, { flex: 1 }]}
+                style={[styles.dropdown, { width: "100%", height: 50 }]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 data={filterType}
@@ -285,11 +251,12 @@ const Search = () => {
                 valueField="value"
                 placeholder={""}
                 value={selectedFilter}
-                onChange={handleFilterChange} // Update this line
+                onChange={handleFilterChange}
                 renderItem={renderItem}
               />
+              <Text style={[styles.titleDropdownFilter]}>Filter category:</Text>
               <DropdownLib
-                style={[styles.dropdown, { flex: 1 }]}
+                style={[styles.dropdown, { width: "100%", height: 50 }]}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 data={categoryType}
@@ -297,7 +264,7 @@ const Search = () => {
                 valueField="value"
                 placeholder={""}
                 value={selectedCategory}
-                onChange={handleCategoryChange} // Update this line
+                onChange={handleCategoryChange}
                 renderItem={renderItem}
               />
             </View>
@@ -311,6 +278,10 @@ const Search = () => {
 export default Search;
 
 const styles = StyleSheet.create({
+  titleDropdownFilter: {
+    fontFamily: "outfit-medium",
+    marginBottom: Spacing,
+  },
   dropdownItem: {
     fontSize: 16,
     color: "black",
@@ -345,8 +316,9 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    marginVertical: 10,
+    padding: Spacing * 0.4,
+    paddingLeft: Spacing * 1.6,
+    marginVertical: Spacing,
     borderRadius: Spacing,
   },
   searchInput: {
@@ -377,6 +349,6 @@ const styles = StyleSheet.create({
   dishBoxContent: {
     fontFamily: "outfit-bold",
     marginBottom: Spacing * 0.6,
-    color: Colors.orange,
+    color: Colors.primary,
   },
 });

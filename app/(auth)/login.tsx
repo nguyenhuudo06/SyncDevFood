@@ -36,8 +36,6 @@ const validationSchema = Yup.object().shape({
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const statecontent = useSelector((state) => state.auth);
-  console.log(statecontent);
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
@@ -124,7 +122,7 @@ const Login = () => {
                       />
                       <View style={styles.showError}>
                         {touched.email && errors.email && (
-                          <Text style={{ color: "red" }}>{errors.email}</Text>
+                          <Text style={[styles.errorText]}>{errors.email}</Text>
                         )}
                       </View>
 
@@ -141,7 +139,7 @@ const Login = () => {
                       />
                       <View style={styles.showError}>
                         {touched.password && errors.password && (
-                          <Text style={{ color: "red" }}>
+                          <Text  style={[styles.errorText]}>
                             {errors.password}
                           </Text>
                         )}
@@ -165,9 +163,12 @@ const Login = () => {
                 >
                   <Text style={styles.signInText}>
                     {loading ? (
-                      <ActivityIndicator size="small" color="#fff" />
+                      <ActivityIndicator
+                        size={Spacing * 1.6}
+                        color={Colors.white}
+                      />
                     ) : (
-                      " Sign in"
+                      "Sign in"
                     )}
                   </Text>
                 </TouchableOpacity>
@@ -232,11 +233,11 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontFamily: "outfit-medium",
     fontSize: FontSize.large,
-    maxWidth: "60%",
+    maxWidth: "90%",
     textAlign: "center",
   },
   showError: {
-    height: 20,
+    height: Spacing * 2.6,
   },
   inputContainer: {
     marginVertical: Spacing * 3,
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     padding: Spacing * 2,
+    height: 68,
     backgroundColor: Colors.primary,
     marginVertical: Spacing * 3,
     borderRadius: Spacing,
@@ -272,13 +274,13 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-medium",
     textAlign: "center",
     color: Colors.onPrimary,
-    fontSize: FontSize.large,
+    fontSize: FontSize.medium,
   },
   createAccountButton: {
     padding: Spacing,
   },
   createAccountText: {
-    fontFamily: "outfit-medium",
+    fontFamily: "outfit-regular",
     textAlign: "center",
     color: Colors.text,
     fontSize: FontSize.small,
@@ -303,5 +305,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray,
     borderRadius: Spacing / 2,
     marginHorizontal: Spacing,
+  },
+  errorText: {
+    color: Colors.danger,
+    marginTop: 5,
+    fontFamily: "outfit-regular",
   },
 });

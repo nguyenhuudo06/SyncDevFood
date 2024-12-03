@@ -14,7 +14,6 @@ const TabBar = ({ state, descriptors, navigation }) => {
   const cartCount = useSelector(
     (state: RootState) => state.order.carts.length || 0
   );
-  console.log("cartCount: ", cartCount);
 
   const icons = {
     home: (props: any) => (
@@ -33,8 +32,8 @@ const TabBar = ({ state, descriptors, navigation }) => {
           style={{
             position: "absolute",
             top: -6,
-            right: -10,
-            width: 20,
+            right: -20,
+            width: 30,
             height: 20,
             backgroundColor: "rgba(232, 17, 63, 0.87)",
             display: "flex",
@@ -47,6 +46,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
             style={{
               color: "white",
               fontFamily: "outfit-regular",
+              fontSize: 11,
             }}
           >
             {cartCount}

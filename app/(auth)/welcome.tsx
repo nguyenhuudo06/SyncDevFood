@@ -1,6 +1,5 @@
 import {
   View,
-  SafeAreaView,
   ImageBackground,
   Dimensions,
   Text,
@@ -16,7 +15,7 @@ const { height } = Dimensions.get("window");
 
 const Welcome = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <ImageBackground
           style={{ height: height / 2.5, width: "100%" }}
@@ -103,7 +102,7 @@ const Welcome = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

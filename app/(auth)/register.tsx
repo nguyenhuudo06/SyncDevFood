@@ -49,21 +49,19 @@ const Register = () => {
       }
 
       Toast.show({
-        type: "success",
+        type: "customToast",
         text1: "Registration successful!",
-        text2: "You can now log in to your account.",
         onPress: () => Toast.hide(),
       });
 
       setLoading(false);
-      // router.replace("./login");
+      router.replace("./login");
     } catch (error) {
       console.error(error);
 
       Toast.show({
-        type: "error",
+        type: "customToast",
         text1: "Registration failed!",
-        text2: error.response?.data?.errors.error || "Something went wrong!",
         onPress: () => Toast.hide(),
       });
 
@@ -72,7 +70,7 @@ const Register = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <View style={styles.paddingView}>
           <View style={styles.titleContainer}>
@@ -171,7 +169,10 @@ const Register = () => {
                 >
                   <Text style={styles.signUpText}>
                     {loading ? (
-                      <ActivityIndicator size="small" color="#fff" />
+                      <ActivityIndicator
+                        size={Spacing * 1.6}
+                        color={Colors.white}
+                      />
                     ) : (
                       "Sign up"
                     )}
@@ -181,23 +182,37 @@ const Register = () => {
             )}
           </Formik>
 
-          <View style={{ flexDirection: "row", justifyContent : "space-between", alignItems: "center" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <TouchableOpacity
               onPress={() => router.replace("./login")}
               style={styles.createAccountButton}
             >
-              <Text style={[styles.createAccountText, {color: Colors.primary}]}>Sign in</Text>
+              <Text
+                style={[styles.createAccountText, { color: Colors.primary }]}
+              >
+                Sign in
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.replace("../(tabs)/home")}
               style={styles.createAccountButton}
             >
-              <Text style={[styles.createAccountText, {color: Colors.primary}]}>Home page</Text>
+              <Text
+                style={[styles.createAccountText, { color: Colors.primary }]}
+              >
+                Home page
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -206,7 +221,6 @@ export default Register;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: StatusBar.currentHeight,
   },
   scrollView: {
     flexGrow: 1,
@@ -227,15 +241,16 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontFamily: "outfit-medium",
     fontSize: FontSize.large,
-    maxWidth: "60%",
+    maxWidth: "90%",
     textAlign: "center",
   },
   inputContainer: {
     marginVertical: Spacing,
   },
   errorText: {
-    color: "red",
+    color: Colors.danger,
     marginTop: 5,
+    fontFamily: "outfit-regular",
   },
   input: {
     fontFamily: "outfit-regular",
@@ -247,8 +262,10 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     padding: Spacing * 2,
+    height: 68,
     backgroundColor: Colors.primary,
     marginVertical: Spacing * 3,
+    marginTop: Spacing * 1,
     borderRadius: Spacing,
     shadowColor: Colors.primary,
     shadowOffset: {
@@ -262,13 +279,13 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-medium",
     textAlign: "center",
     color: Colors.onPrimary,
-    fontSize: FontSize.large,
+    fontSize: FontSize.medium,
   },
   createAccountButton: {
     padding: Spacing,
   },
   createAccountText: {
-    fontFamily: "outfit-medium",
+    fontFamily: "outfit-regular",
     textAlign: "center",
     color: Colors.text,
     fontSize: FontSize.small,
@@ -295,6 +312,6 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing,
   },
   showError: {
-    height: 20,
+    height: Spacing * 2.6,
   },
 });

@@ -2,11 +2,9 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Image,
   Dimensions,
-  StatusBar,
 } from "react-native";
 import { TouchableOpacity, TextInput } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
@@ -26,18 +24,14 @@ import {
   callAddDishToWishList,
   callGetAllDishes,
   callGetDishDetail,
-  callProductDetail,
 } from "@/services/api-call";
-import Checkbox from "expo-checkbox";
 import { formatCurrency } from "@/utils/currency";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Toast from "react-native-toast-message";
 import { CartItem, doAddProductAction } from "@/redux/orderSlice/orderSlice";
-import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
-import RenderHTML from "react-native-render-html";
+import { BottomModal, ModalContent } from "react-native-modals";
 import WebView from "react-native-webview";
-import CommentSection from "@/components/Comment/Comment";
 import Comment from "@/components/Comment/Comment";
 import Loading from "@/components/Loading/Loading";
 import RatingChoose from "@/components/Comment/RatingChoose";
@@ -99,7 +93,11 @@ const ProductDetails = () => {
         body {
           font-size: 40px;
           line-height: 1.6;
-          font-family: Arial, sans-serif;
+          font-family: outfit-regular;
+          margin: 0;
+          padding: 0;
+          overflow-y: scroll;
+          height: 100%;
         }
       </style>
     </head>
@@ -169,9 +167,8 @@ const ProductDetails = () => {
           console.error("Dish not found");
 
           Toast.show({
-            type: "error",
+            type: "customToast",
             text1: "Dish not found",
-            text2: "The requested dish could not be found.",
             onPress: () => Toast.hide(),
           });
           router.replace("../(tabs)/home");
@@ -180,11 +177,11 @@ const ProductDetails = () => {
         console.error("Error fetching dish detail:", error);
 
         Toast.show({
-          type: "error",
+          type: "customToast",
           text1: "Error loading dish details",
-          text2: "Please try again later.",
           onPress: () => Toast.hide(),
         });
+        router.back();
       } finally {
         setLoading(false);
       }
@@ -207,9 +204,8 @@ const ProductDetails = () => {
         setCurrentQuantity((Number(currentQuantity) + 1).toString());
       } else {
         Toast.show({
-          type: "error",
-          text1: `Maximum quantity available is ${dishDetail?.availableQuantity}!`,
-          text2: "Cannot add more items",
+          type: "customToast",
+          text1: `Quantity available is ${dishDetail?.availableQuantity}!`,
           onPress: () => Toast.hide(),
         });
       }
@@ -488,11 +484,7 @@ const ProductDetails = () => {
         <View>
           <Text style={styles.dishName}>{dishDetail?.dishName}</Text>
           <View style={styles.ratingContainer}>
-            <FontAwesome
-              name="star-half-empty"
-              size={Spacing * 1.6}
-              color={Colors.primary}
-            />
+            <AntDesign name="star" size={Spacing * 2} color={Colors.orange} />
             <Text style={styles.ratingText}>
               {dishDetail?.rating || "No rating"}
             </Text>
@@ -676,15 +668,13 @@ const ProductDetails = () => {
         }
       >
         <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
-          <ScrollView contentContainerStyle={{ flex: 1 }}>
-            <View style={styles.bottomModalContent}>
-              <WebView
-                originWhitelist={["*"]}
-                source={{ html: modifiedHtml }}
-                style={{ flex: 1 }}
-              />
-            </View>
-          </ScrollView>
+          <View style={styles.bottomModalContent}>
+            <WebView
+              originWhitelist={["*"]}
+              source={{ html: modifiedHtml }}
+              style={{ width: "100%" }}
+            />
+          </View>
         </ModalContent>
       </BottomModal>
 

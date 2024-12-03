@@ -24,7 +24,7 @@ const Header = () => {
       <View>
         <ImageBackground
           source={require("../../assets/images/Pattern.png")}
-          style={{ width: "100%", padding: 20 }}
+          style={{ width: "100%", padding: Spacing }}
         >
           <View>
             <View
@@ -53,7 +53,9 @@ const Header = () => {
                 </TouchableOpacity>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <TouchableOpacity onPress={() => router.push("../../(tabs)/profile")}>
+                <TouchableOpacity
+                  onPress={() => router.push("../../(tabs)/profile")}
+                >
                   <Ionicons
                     name="menu"
                     size={Spacing * 3.5}
@@ -67,19 +69,21 @@ const Header = () => {
                 onPress={() => router.push(`../../(tabs)/search`)}
               >
                 <LinearGradient
-                  colors={["#FFF0F0", "#F76D02B5"]}
+                  colors={[Colors.primary_20, Colors.primary]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    padding: 10,
-                    marginVertical: 10,
+                    padding: Spacing * 0.4,
+                    paddingLeft: Spacing * 1.6,
+                    marginVertical: Spacing,
                     borderRadius: Spacing,
                   }}
                 >
                   <Ionicons name="search" size={24} color={Colors.text} />
                   <TextInput
+                    onFocus={() => router.push(`../../(tabs)/search`)}
                     placeholder="Search"
                     style={{
                       fontSize: 16,

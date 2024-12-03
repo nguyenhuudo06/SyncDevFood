@@ -81,7 +81,7 @@ const Comment = ({ dishId }) => {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        style={{ padding: Spacing }}
+        style={{ padding: Spacing, flex: 1 }}
         data={orderData}
         keyExtractor={(item) => item.reviewId}
         renderItem={({ item }) => (

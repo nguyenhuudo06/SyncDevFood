@@ -14,9 +14,9 @@ const Home = () => {
     <ScrollView style={styles.scrollView}>
       <View style={{ backgroundColor: "#ffffff", display: "flex" }}>
         {/* Header */}
-        <Header />
+        <Header /> 
         {/* Slider */}
-        <View style={{ paddingHorizontal: Spacing }}>
+        <View> 
           <Text style={styles.title}>Offers</Text>
         </View>
         <Slider />
