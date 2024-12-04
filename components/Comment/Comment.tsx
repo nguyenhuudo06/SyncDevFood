@@ -79,14 +79,14 @@ const Comment = ({ dishId }) => {
   if (loading) return <Loading />;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ width: "100%" }}>
       <FlatList
-        style={{ padding: Spacing, flex: 1 }}
+        style={{ flex: 1 }}
         data={orderData}
         keyExtractor={(item) => item.reviewId}
         renderItem={({ item }) => (
           <View style={[styles.flexStart]}>
-            <View style={{ marginRight: Spacing }}>
+            <View>
               <ImageWithFallback
                 source={{ uri: item.userAvatar }}
                 fallbackSource={require("../../assets/images/pngegg.png")}
@@ -151,5 +151,6 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-regular",
     fontSize: FontSize.small,
     marginBottom: Spacing * 0.6,
+    flexWrap: "wrap",
   },
 });

@@ -19,7 +19,7 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
 
   const fetchAllProducts = async (page = 0, accumulatedProducts = []) => {
-    console.log("Fetch data");
+    // console.log("Fetch data");
     try {
       const response = await callAllProduct(page);
 
@@ -108,7 +108,7 @@ const ProductList = () => {
                   fontFamily: "outfit-medium",
                   fontSize: FontSize.medium,
                   lineHeight: FontSize.medium * 1.2,
-                  minHeight: 2 * (FontSize.medium * 1.4),
+                  minHeight: 2 * (FontSize.medium * 1.6),
                 }}
               >
                 {item?.dishName}

@@ -43,7 +43,7 @@ interface ImageOption {
   imageUrl: string;
 }
 
-interface DishDetail {
+export interface DishDetail {
   categoryId: string;
   categoryName: string;
   description: string;
@@ -442,7 +442,7 @@ const ProductDetails = () => {
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
+    <ScrollView style={styles.scrollView}>
       <BackButton />
 
       <View style={styles.carouselContainer}>
@@ -618,10 +618,11 @@ const ProductDetails = () => {
           <TouchableOpacity
             style={[styles.contentModalButton]}
             onPress={() =>
-              setBottomModal((prevState) => ({
-                ...prevState,
-                description: true,
-              }))
+              // setBottomModal((prevState) => ({
+              //   ...prevState,
+              //   description: true,
+              // }))
+              router.push(`../productDescription/${dishDetail.dishId}`)
             }
           >
             <Text style={[styles.contentModalButtonContent]}>Description</Text>
@@ -630,10 +631,11 @@ const ProductDetails = () => {
           <TouchableOpacity
             style={[styles.contentModalButton]}
             onPress={() =>
-              setBottomModal((prevState) => ({
-                ...prevState,
-                reviews: true,
-              }))
+              // setBottomModal((prevState) => ({
+              //   ...prevState,
+              //   reviews: true,
+              // }))
+              router.push(`../productComment/${dishDetail.dishId}`)
             }
           >
             <Text style={[styles.contentModalButtonContent]}>Reviews</Text>
@@ -739,7 +741,7 @@ const styles = StyleSheet.create({
   divider: { height: "100%", width: 1, backgroundColor: Colors.gray },
 
   // ScrollView styles
-  scrollView: { backgroundColor: "#fff" },
+  scrollView: { backgroundColor: "#fff", flex: 1 },
 
   // Carousel styles
   carouselContainer: {

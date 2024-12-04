@@ -1,30 +1,26 @@
 import {
   View,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Button,
   ActivityIndicator,
-  StatusBar,
 } from "react-native";
 import React, { useState } from "react";
 import Spacing from "@/constants/Spacing";
 import FontSize from "@/constants/FontSize";
 import Colors from "@/constants/Colors";
 import { TextInput } from "react-native";
-import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { callLogin, callProfile } from "@/services/api-call";
 import Toast from "react-native-toast-message";
-import { isLoading } from "expo-font";
 import { setAccessToken } from "@/utils/axios-instance";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/authSlice/authSlice";
+import { Entypo } from "@expo/vector-icons";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -36,6 +32,7 @@ const validationSchema = Yup.object().shape({
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
@@ -126,20 +123,48 @@ const Login = () => {
                         )}
                       </View>
 
-                      <TextInput
-                        placeholder="Password"
-                        placeholderTextColor={Colors.darkText}
-                        secureTextEntry
-                        style={styles.input}
-                        onChangeText={(text) =>
-                          handleChange("password")(text.trim())
-                        }
-                        onBlur={handleBlur("password")}
-                        value={values.password}
-                      />
+                      <View style={{ marginTop: Spacing }}>
+                        <TouchableOpacity
+                          onPress={() => setShowPassword((prev) => !prev)}
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            right: 0,
+                            transform: [{ translateY: "-50%" }],
+                            marginRight: Spacing,
+                          }}
+                        >
+                          {showPassword ? (
+                            <Entypo
+                              name="eye"
+                              size={Spacing * 2}
+                              color={Colors.primary}
+                              style={{ padding: Spacing }}
+                            />
+                          ) : (
+                            <Entypo
+                              name="eye-with-line"
+                              size={Spacing * 2}
+                              color={Colors.gray}
+                              style={{ padding: Spacing }}
+                            />
+                          )}
+                        </TouchableOpacity>
+                        <TextInput
+                          placeholder="Password"
+                          placeholderTextColor={Colors.darkText}
+                          secureTextEntry={!showPassword}
+                          style={styles.input}
+                          onChangeText={(text) =>
+                            handleChange("password")(text.trim())
+                          }
+                          onBlur={handleBlur("password")}
+                          value={values.password}
+                        />
+                      </View>
                       <View style={styles.showError}>
                         {touched.password && errors.password && (
-                          <Text  style={[styles.errorText]}>
+                          <Text style={[styles.errorText]}>
                             {errors.password}
                           </Text>
                         )}
@@ -246,9 +271,9 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-regular",
     fontSize: FontSize.small,
     padding: Spacing * 2,
+    paddingRight: Spacing * 5,
     backgroundColor: Colors.lightPrimary,
     borderRadius: Spacing,
-    marginTop: Spacing,
   },
   forgotPasswordText: {
     fontFamily: "outfit-regular",

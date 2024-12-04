@@ -164,6 +164,16 @@ export default function RootLayout() {
               />
 
               <Stack.Screen
+                name="(product)/productComment/[productComment]"
+                options={{ headerShown: false }}
+              />
+
+              <Stack.Screen
+                name="(product)/productDescription/[productDescription]"
+                options={{ headerShown: false }}
+              />
+
+              <Stack.Screen
                 name="(blog)/blogList"
                 options={{ headerShown: false }}
               />

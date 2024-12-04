@@ -13,7 +13,12 @@ import Spacing from "@/constants/Spacing";
 import FontSize from "@/constants/FontSize";
 import Colors from "@/constants/Colors";
 import { TextInput } from "react-native";
-import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import {
+  Entypo,
+  FontAwesome,
+  FontAwesome5,
+  Ionicons,
+} from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -33,6 +38,10 @@ const validationSchema = Yup.object().shape({
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const handleRegister = async (values: any) => {
     setLoading(true);
@@ -130,30 +139,96 @@ const Register = () => {
                     )}
                   </View>
 
-                  <TextInput
-                    placeholder="Password"
-                    placeholderTextColor={Colors.darkText}
-                    secureTextEntry
-                    style={styles.input}
-                    onChangeText={handleChange("password")}
-                    onBlur={handleBlur("password")}
-                    value={values.password}
-                  />
+                  <View style={{ marginTop: Spacing }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setShowPassword((prev) => ({
+                          ...prev,
+                          password: !prev.password,
+                        }))
+                      }
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: 0,
+                        transform: [{ translateY: "-50%" }],
+                        marginRight: Spacing,
+                      }}
+                    >
+                      {showPassword.password ? (
+                        <Entypo
+                          name="eye"
+                          size={Spacing * 2}
+                          color={Colors.primary}
+                          style={{ padding: Spacing }}
+                        />
+                      ) : (
+                        <Entypo
+                          name="eye-with-line"
+                          size={Spacing * 2}
+                          color={Colors.gray}
+                          style={{ padding: Spacing }}
+                        />
+                      )}
+                    </TouchableOpacity>
+                    <TextInput
+                      placeholder="Password"
+                      placeholderTextColor={Colors.darkText}
+                      secureTextEntry={!showPassword.password}
+                      style={styles.input}
+                      onChangeText={handleChange("password")}
+                      onBlur={handleBlur("password")}
+                      value={values.password}
+                    />
+                  </View>
                   <View style={styles.showError}>
                     {touched.password && errors.password && (
                       <Text style={styles.errorText}>{errors.password}</Text>
                     )}
                   </View>
 
-                  <TextInput
-                    placeholder="Confirm Password"
-                    placeholderTextColor={Colors.darkText}
-                    secureTextEntry
-                    style={styles.input}
-                    onChangeText={handleChange("confirmPassword")}
-                    onBlur={handleBlur("confirmPassword")}
-                    value={values.confirmPassword}
-                  />
+                  <View style={{ marginTop: Spacing }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setShowPassword((prev) => ({
+                          ...prev,
+                          confirmPassword: !prev.confirmPassword,
+                        }))
+                      }
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: 0,
+                        transform: [{ translateY: "-50%" }],
+                        marginRight: Spacing,
+                      }}
+                    >
+                      {showPassword.password ? (
+                        <Entypo
+                          name="eye"
+                          size={Spacing * 2}
+                          color={Colors.primary}
+                          style={{ padding: Spacing }}
+                        />
+                      ) : (
+                        <Entypo
+                          name="eye-with-line"
+                          size={Spacing * 2}
+                          color={Colors.gray}
+                          style={{ padding: Spacing }}
+                        />
+                      )}
+                    </TouchableOpacity>
+                    <TextInput
+                      placeholder="Confirm Password"
+                      placeholderTextColor={Colors.darkText}
+                      secureTextEntry={!showPassword.confirmPassword}
+                      style={styles.input}
+                      onChangeText={handleChange("confirmPassword")}
+                      onBlur={handleBlur("confirmPassword")}
+                      value={values.confirmPassword}
+                    />
+                  </View>
                   <View style={styles.showError}>
                     {touched.confirmPassword && errors.confirmPassword && (
                       <Text style={styles.errorText}>
@@ -256,9 +331,9 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-regular",
     fontSize: FontSize.small,
     padding: Spacing * 2,
+    paddingRight: Spacing * 5,
     backgroundColor: Colors.lightPrimary,
     borderRadius: Spacing,
-    marginTop: Spacing,
   },
   signUpButton: {
     padding: Spacing * 2,

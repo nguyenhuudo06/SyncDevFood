@@ -2,7 +2,6 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import WebView from "react-native-webview";
-import { DEPLOY_BACKEND_URL } from "@/constants/Enviroment";
 import { ScrollView } from "react-native-gesture-handler";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
 import Spacing from "@/constants/Spacing";
