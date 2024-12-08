@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import WebView from "react-native-webview";
 import { ScrollView } from "react-native-gesture-handler";
@@ -10,46 +10,50 @@ import { callGetBlogById } from "@/services/api-call";
 import ImageWithFallback from "@/components/Image/ImageWithFallback";
 import FontSize from "@/constants/FontSize";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import Loading from "@/components/Loading/Loading";
 
 const BlogId = () => {
   const route = useRoute();
   const { blogDetails } = route.params;
   const [blogData, setBlogData] = useState(null);
   const [webViewHeight, setWebViewHeight] = useState(0);
-  // console.log("blogData: ", blogData?.content);
+  console.log("blogData: ", "render");
 
-  const modifiedHtml = `
-  <html>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>
-        body {
-          font-size: 16px;
-          line-height: 1.6;
-          font-family: "outfit-regular";
-          margin: 0;
-          padding: 0;
-          overflow-y: hidden; /* Ngăn cuộn bên trong WebView */
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-      </style>
-      <script>
-        function sendHeight() {
-          const height = document.body.scrollHeight;
-          window.ReactNativeWebView.postMessage(height);
-        }
-        window.onload = sendHeight;
-        window.onresize = sendHeight;
-      </script>
-    </head>
-    <body>
-      ${blogData?.content}
-    </body>
-  </html>
-  `;
+  const modifiedHtml = useMemo(() => {
+    return `
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-size: 16px;
+              line-height: 1.6;
+              font-family: "outfit-regular";
+              margin: 0;
+              padding: 0;
+              overflow-y: hidden; /* Ngăn cuộn bên trong WebView */
+              overflow-x: hidden;
+              -webkit-touch-callout: none;
+              -webkit-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+            }
+          </style>
+          <script>
+            function sendHeight() {
+              const height = document.body.scrollHeight;
+              window.ReactNativeWebView.postMessage(height);
+            }
+            window.onload = sendHeight;
+            window.onresize = sendHeight;
+          </script>
+        </head>
+        <body>
+          ${blogData?.content}
+        </body>
+      </html>
+    `;
+  }, [blogData]);
 
   const fetchBlogData = async () => {
     try {
@@ -73,7 +77,7 @@ const BlogId = () => {
         <HeaderPage titlePage="" />
       </View>
       {blogData == null ? (
-        <Text>Error</Text>
+        <Loading />
       ) : (
         <ScrollView style={[styles.container]}>
           <View style={{ marginBottom: Spacing }}>
@@ -142,16 +146,6 @@ const BlogId = () => {
             </View>
           </View>
 
-          {/* <View style={{ flex: 1, minHeight: 600 }}>
-            <WebView
-              style={{ flex: 1 }}
-              originWhitelist={["*"]}
-              source={{ html: modifiedHtml }}
-              javaScriptEnabled={true} // Kích hoạt JavaScript
-              domStorageEnabled={true} // Kích hoạt lưu trữ DOM
-            />
-          </View> */}
-
           <WebView
             style={{ width: "100%", height: webViewHeight }}
             originWhitelist={["*"]}
@@ -159,8 +153,10 @@ const BlogId = () => {
             javaScriptEnabled={true}
             domStorageEnabled={true}
             onMessage={(event) => {
-              const height = parseInt(event.nativeEvent.data, 10);
-              setWebViewHeight(height);
+              const newHeight = parseInt(event.nativeEvent.data, 10);
+              if (newHeight !== webViewHeight) {
+                setWebViewHeight(newHeight);
+              }
             }}
           />
         </ScrollView>

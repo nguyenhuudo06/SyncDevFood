@@ -111,32 +111,38 @@ const Register = () => {
             }) => (
               <>
                 <View style={styles.inputContainer}>
-                  <TextInput
-                    placeholder="Full name"
-                    placeholderTextColor={Colors.darkText}
-                    style={styles.input}
-                    onChangeText={handleChange("fullName")}
-                    onBlur={handleBlur("fullName")}
-                    value={values.fullName}
-                  />
-                  <View style={styles.showError}>
-                    {touched.fullName && errors.fullName && (
-                      <Text style={styles.errorText}>{errors.fullName}</Text>
-                    )}
+                  <View style={{ marginTop: Spacing }}>
+                    <TextInput
+                      numberOfLines={1}
+                      placeholder="Full name"
+                      placeholderTextColor={Colors.darkText}
+                      style={styles.input}
+                      onChangeText={handleChange("fullName")}
+                      onBlur={handleBlur("fullName")}
+                      value={values.fullName}
+                    />
+                    <View style={styles.showError}>
+                      {touched.fullName && errors.fullName && (
+                        <Text style={styles.errorText}>{errors.fullName}</Text>
+                      )}
+                    </View>
                   </View>
 
-                  <TextInput
-                    placeholder="Email"
-                    placeholderTextColor={Colors.darkText}
-                    style={styles.input}
-                    onChangeText={handleChange("email")}
-                    onBlur={handleBlur("email")}
-                    value={values.email}
-                  />
-                  <View style={styles.showError}>
-                    {touched.email && errors.email && (
-                      <Text style={styles.errorText}>{errors.email}</Text>
-                    )}
+                  <View style={{ marginTop: Spacing }}>
+                    <TextInput
+                      numberOfLines={1}
+                      placeholder="Email"
+                      placeholderTextColor={Colors.darkText}
+                      style={styles.input}
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
+                      value={values.email}
+                    />
+                    <View style={styles.showError}>
+                      {touched.email && errors.email && (
+                        <Text style={styles.errorText}>{errors.email}</Text>
+                      )}
+                    </View>
                   </View>
 
                   <View style={{ marginTop: Spacing }}>
@@ -151,8 +157,9 @@ const Register = () => {
                         position: "absolute",
                         top: "50%",
                         right: 0,
-                        transform: [{ translateY: "-50%" }],
+                        transform: [{ translateY: -(Spacing * 2) }],
                         marginRight: Spacing,
+                        zIndex: 10,
                       }}
                     >
                       {showPassword.password ? (
@@ -172,6 +179,7 @@ const Register = () => {
                       )}
                     </TouchableOpacity>
                     <TextInput
+                      numberOfLines={1}
                       placeholder="Password"
                       placeholderTextColor={Colors.darkText}
                       secureTextEntry={!showPassword.password}
@@ -199,11 +207,12 @@ const Register = () => {
                         position: "absolute",
                         top: "50%",
                         right: 0,
-                        transform: [{ translateY: "-50%" }],
+                        transform: [{ translateY: -(Spacing * 2) }],
                         marginRight: Spacing,
+                        zIndex: 10,
                       }}
                     >
-                      {showPassword.password ? (
+                      {showPassword.confirmPassword ? (
                         <Entypo
                           name="eye"
                           size={Spacing * 2}
@@ -220,6 +229,7 @@ const Register = () => {
                       )}
                     </TouchableOpacity>
                     <TextInput
+                      numberOfLines={1}
                       placeholder="Confirm Password"
                       placeholderTextColor={Colors.darkText}
                       secureTextEntry={!showPassword.confirmPassword}
@@ -338,6 +348,9 @@ const styles = StyleSheet.create({
   signUpButton: {
     padding: Spacing * 2,
     height: 68,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: Colors.primary,
     marginVertical: Spacing * 3,
     marginTop: Spacing * 1,

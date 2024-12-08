@@ -52,7 +52,7 @@ export const callDeleteAddress = (addressId: string) => {
 
 export const callAllProduct = async (pageNumber: number) => {
   return instance.get(
-    `/api/v1/auth/guest/get-all-dishes?pageNo=${pageNumber}&pageSize=1&sortBy=dishName&sortDir=asc`
+    `/api/v1/auth/guest/get-all-dishes?pageNo=${pageNumber}&pageSize=100&sortBy=dishName&sortDir=asc`
   );
 };
 

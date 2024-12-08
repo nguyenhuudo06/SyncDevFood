@@ -2,38 +2,29 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   Modal,
   ActivityIndicator,
   FlatList,
 } from "react-native";
-import BackButton from "@/components/Material/BackButton";
-import { WebView } from "react-native-webview";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   callAddress,
   callCreateOrder,
   callGeocoding,
   callProcessPayment,
 } from "@/services/api-call";
-import {
-  AntDesign,
-  Feather,
-  FontAwesome,
-  Ionicons,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
 import Checkbox from "expo-checkbox";
 import FontSize from "@/constants/FontSize";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { doClearCartAction } from "@/redux/orderSlice/orderSlice";
 import { setPaymentUrl } from "@/redux/paymentUrlSlice/paymentUrlSlice";
@@ -113,6 +104,7 @@ export interface OrderInformation {
 
 const Checkout = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const userId = useSelector((state: RootState) => state.auth.user_id);
@@ -189,8 +181,10 @@ const Checkout = () => {
   };
 
   const fetchAddresses = async (userId: string | null) => {
+    console.log("fethc adđ")
     try {
       const responseState = await callAddress(userId);
+
       if (responseState.status < 200 || responseState.status >= 300) {
         throw new Error("Request failed with status " + responseState.status);
       }
@@ -199,15 +193,23 @@ const Checkout = () => {
         responseState.data._embedded.addressByUserIdResponseList.flatMap(
           (item: any) => item.addresses
         );
+
       setAddresses(addressList);
     } catch (error) {
-      console.error("Error occurred:", error);
+      console.error("Error:", error);
     }
   };
 
   useEffect(() => {
     fetchAddresses(userId);
-  }, [userId]);
+  }, [userId, router]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Mỗi khi màn hình được focus lại, fetch lại địa chỉ
+      fetchAddresses(userId);
+    }, [userId])
+  );
 
   // Tính toán địa lý
   const handleSelectAddress = async (id: string) => {
@@ -359,13 +361,11 @@ const Checkout = () => {
                   onPress={() => router.push("../(account)/address")}
                   style={{
                     backgroundColor: Colors.primary_10,
-                    padding: Spacing * 0.4,
-                    paddingHorizontal: Spacing,
+                    padding: Spacing,
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: Spacing * 0.8,
-                    marginBottom: Spacing,
                   }}
                 >
                   <AntDesign

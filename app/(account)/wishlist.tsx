@@ -9,8 +9,6 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
 import Spacing from "@/constants/Spacing";
 import { useSelector } from "react-redux";
@@ -70,7 +68,7 @@ const Wishlist = () => {
       const totalPage = response.data.page.totalPages;
 
       // Ngừng tải thêm nếu không còn dữ liệu hoặc dữ liệu ít hơn `pageSize`
-      setHasMore((page >= Number(totalPage) - 1) ? false : true);
+      setHasMore(page >= Number(totalPage) - 1 ? false : true);
 
       // Gộp dữ liệu nếu có nhiều trang
       setWishList((prev) => (page === 0 ? orders : [...prev, ...orders]));
@@ -83,6 +81,33 @@ const Wishlist = () => {
     }
   };
 
+  // const handleDeleteWishList = async (dishId: string) => {
+  //   try {
+  //     const response = await callDeleteDishFromWishList(dishId, userId);
+
+  //     if (response.status < 200 || response.status >= 300) {
+  //       throw new Error("Request failed with status " + response.status);
+  //     }
+
+  //     Toast.show({
+  //       type: "customToast",
+  //       text1: "Removed successfully!",
+  //       onPress: () => Toast.hide(),
+  //       visibilityTime: 1800,
+  //     });
+
+  //     fetchData(0);
+  //   } catch (error) {
+  //     console.error("Remove error: ", error);
+  //     Toast.show({
+  //       type: "customToast",
+  //       text1: "Failed remove!",
+  //       onPress: () => Toast.hide(),
+  //       visibilityTime: 1800,
+  //     });
+  //   }
+  // };
+
   const handleDeleteWishList = async (dishId: string) => {
     try {
       const response = await callDeleteDishFromWishList(dishId, userId);
@@ -91,14 +116,19 @@ const Wishlist = () => {
         throw new Error("Request failed with status " + response.status);
       }
 
+      // Cập nhật danh sách wishList
+      setWishList((prev) =>
+        prev.filter((item) =>
+          item.dishes.some((dish) => dish.dishId !== dishId)
+        )
+      );
+
       Toast.show({
         type: "customToast",
         text1: "Removed successfully!",
         onPress: () => Toast.hide(),
         visibilityTime: 1800,
       });
-
-      fetchData(0);
     } catch (error) {
       console.error("Remove error: ", error);
       Toast.show({

@@ -108,6 +108,7 @@ const Login = () => {
                   <View>
                     <View style={styles.inputContainer}>
                       <TextInput
+                        numberOfLines={1}
                         placeholder="Email"
                         placeholderTextColor={Colors.darkText}
                         style={styles.input}
@@ -130,8 +131,9 @@ const Login = () => {
                             position: "absolute",
                             top: "50%",
                             right: 0,
-                            transform: [{ translateY: "-50%" }],
+                            transform: [{ translateY: -(Spacing * 2) }],
                             marginRight: Spacing,
+                            zIndex: 10,
                           }}
                         >
                           {showPassword ? (
@@ -151,6 +153,7 @@ const Login = () => {
                           )}
                         </TouchableOpacity>
                         <TextInput
+                          numberOfLines={1}
                           placeholder="Password"
                           placeholderTextColor={Colors.darkText}
                           secureTextEntry={!showPassword}
@@ -284,6 +287,9 @@ const styles = StyleSheet.create({
   signInButton: {
     padding: Spacing * 2,
     height: 68,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: Colors.primary,
     marginVertical: Spacing * 3,
     borderRadius: Spacing,

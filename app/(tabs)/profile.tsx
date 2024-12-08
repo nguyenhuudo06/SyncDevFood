@@ -80,7 +80,11 @@ const Profile = () => {
                 borderRadius: Spacing,
               }}
             >
-              <Text>Account</Text>
+              <Text
+                style={[styles.texFontFamily, { fontFamily: "outfit-medium" }]}
+              >
+                Account
+              </Text>
               <TouchableOpacity
                 onPress={() => router.push("../(account)/personaInfor")}
                 style={{
@@ -92,10 +96,7 @@ const Profile = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <FontAwesome5 name="user-tie" style={styles.icon} />
-                  <Text>Personal infor</Text>
-                </View>
-                <View>
-                  <EvilIcons name="arrow-right" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>Personal infor</Text>
                 </View>
               </TouchableOpacity>
               <View style={styles.divider} />
@@ -110,10 +111,7 @@ const Profile = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Entypo name="location" style={styles.icon} />
-                  <Text>Address</Text>
-                </View>
-                <View>
-                  <EvilIcons name="arrow-right" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>Address</Text>
                 </View>
               </TouchableOpacity>
               <View style={styles.divider} />
@@ -128,10 +126,7 @@ const Profile = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Entypo name="shopping-bag" style={styles.icon} />
-                  <Text>Order</Text>
-                </View>
-                <View>
-                  <EvilIcons name="arrow-right" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>Order</Text>
                 </View>
               </TouchableOpacity>
               <View style={styles.divider} />
@@ -146,13 +141,11 @@ const Profile = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Entypo name="heart" style={styles.icon} />
-                  <Text>Wishlist</Text>
-                </View>
-                <View>
-                  <EvilIcons name="arrow-right" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>Wishlist</Text>
                 </View>
               </TouchableOpacity>
               <View style={styles.divider} />
+
               <TouchableOpacity
                 onPress={() => router.push("../(account)/reviews")}
                 style={{
@@ -164,13 +157,27 @@ const Profile = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <FontAwesome name="star-half-empty" style={styles.icon} />
-                  <Text>Reviews</Text>
-                </View>
-                <View>
-                  <EvilIcons name="arrow-right" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>Reviews</Text>
                 </View>
               </TouchableOpacity>
               <View style={styles.divider} />
+
+              <TouchableOpacity
+                onPress={() => router.push("../(task)/aboutus")}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingVertical: Spacing * 0.4,
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <AntDesign name="questioncircle" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>About us</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={styles.divider} />
+
               <TouchableOpacity
                 onPress={() => router.push("../(account)/changePassword")}
                 style={{
@@ -182,10 +189,7 @@ const Profile = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <FontAwesome name="exchange" style={styles.icon} />
-                  <Text>Change password</Text>
-                </View>
-                <View>
-                  <EvilIcons name="arrow-right" style={styles.icon} />
+                  <Text style={[styles.texFontFamily]}>Change password</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -281,8 +285,12 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: Spacing * 0.8,
-    fontSize: 20,
-    color: "black",
+    fontSize: Spacing * 2,
+    color: Colors.text,
+  },
+  texFontFamily: {
+    fontFamily: "outfit-regular",
+    marginLeft: Spacing,
   },
 });
 

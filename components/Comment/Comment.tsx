@@ -6,9 +6,6 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { ScrollView } from "react-native-gesture-handler";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import Loading from "../Loading/Loading";
 import { callGetReviewsByDishId } from "@/services/api-call";
 import Spacing from "@/constants/Spacing";
@@ -16,6 +13,7 @@ import StarRating from "./Rating";
 import FontSize from "@/constants/FontSize";
 import Colors from "@/constants/Colors";
 import ImageWithFallback from "../Image/ImageWithFallback";
+import Toast from "react-native-toast-message";
 
 interface Comment {
   reviewId: string;
@@ -38,7 +36,7 @@ const Comment = ({ dishId }) => {
   const [orderData, setOrderData] = useState<Comment[] | []>([]);
 
   const fetchOrders = async (page = 0) => {
-    const pageSize = 6;
+    const pageSize = 10;
     const urlParams = `pageNo=${page}&pageSize=${pageSize}&sortBy=createdAt&sortDir=desc`;
 
     if (page === 0) setLoading(true);
@@ -51,12 +49,20 @@ const Comment = ({ dishId }) => {
         throw new Error("Request failed with status " + response.status);
       }
 
-      const orders = response.data._embedded?.reviewResponseList || [];
-      if (orders.length < pageSize) setHasMore(false);
+      const comments = response.data._embedded?.reviewResponseList || [];
+      if (comments.length < pageSize) setHasMore(false);
 
-      setOrderData((prev) => (page === 0 ? orders : [...prev, ...orders]));
+      setOrderData((prev) => (page === 0 ? comments : [...prev, ...comments]));
+
+      console.log(orderData);
     } catch (error) {
       console.error("Error fetching order data:", error);
+      Toast.show({
+        type: "customToast",
+        text1: "Sothing wrong!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1800,
+      });
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -79,7 +85,7 @@ const Comment = ({ dishId }) => {
   if (loading) return <Loading />;
 
   return (
-    <View style={{ width: "100%" }}>
+    <View style={{ width: "100%", flex: 1 }}>
       <FlatList
         style={{ flex: 1 }}
         data={orderData}
@@ -101,7 +107,9 @@ const Comment = ({ dishId }) => {
                 resizeMode="cover"
               />
             </View>
-            <View>
+            <View
+              style={{flex: 1, padding: Spacing }}
+            >
               <Text style={[styles.commentName]}>{item.userFullName}</Text>
               <StarRating
                 styleCus={{ paddingVertical: Spacing * 0.6 }}

@@ -96,6 +96,7 @@ const ForgotPassword = () => {
                   <View style={styles.inputContainer}>
                     <View>
                       <TextInput
+                        numberOfLines={1}
                         placeholder="Email"
                         placeholderTextColor={Colors.darkText}
                         style={styles.input}

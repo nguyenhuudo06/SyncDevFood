@@ -7,6 +7,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import { BACKEND_URL } from "@/constants/Enviroment";
 import { callRefreshToken } from "../services/api-call";
+import Toast from "react-native-toast-message";
+import { router } from "expo-router";
 
 // 1. Tạo một Axios instance với cấu hình cơ bản
 const instance = axios.create({
@@ -40,7 +42,14 @@ const handleRefreshToken = async () => {
     return newAccessToken;
   } catch (error) {
     await setAccessToken(null);
-    Alert.alert("Session Expired", "Please log in again.", [{ text: "OK" }]);
+    Toast.show({
+      type: "customToast",
+      text1: "Session expired!",
+      onPress: () => Toast.hide(),
+      visibilityTime: 1000,
+    });
+
+    // router.push("../app/(auth)/login");
     throw error;
   }
 };
@@ -86,16 +95,22 @@ instance.interceptors.response.use(
           return instance(originalRequest); // Gửi lại yêu cầu với token mới
         } catch (refreshError) {
           console.error("Refresh token failed", refreshError);
-          Alert.alert("Session Expired", "Please log in again.", [
-            { text: "OK" },
-          ]);
+          Toast.show({
+            type: "customToast",
+            text1: "Session expired!",
+            onPress: () => Toast.hide(),
+            visibilityTime: 1000,
+          });
           return Promise.reject(refreshError);
         }
       } else {
         console.error("Refresh token failed after 2 attempts");
-        Alert.alert("Session Expired", "Please log in again.", [
-          { text: "OK" },
-        ]);
+        Toast.show({
+          type: "customToast",
+          text1: "Session expired!",
+          onPress: () => Toast.hide(),
+          visibilityTime: 1000,
+        });
         await setAccessToken(null); // Xóa token khi thử lại thất bại
         return error.response || Promise.reject(error);
       }

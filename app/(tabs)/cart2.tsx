@@ -2,8 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  StatusBar,
-  SafeAreaView,
   ScrollView,
   Image,
   TouchableOpacity,
@@ -11,8 +9,6 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BottomModal, ModalTitle, ModalContent } from "react-native-modals";
-import ProductList from "@/components/Product/ProductList";
-import BackButton from "@/components/Material/BackButton";
 import FontSize from "@/constants/FontSize";
 import Spacing from "@/constants/Spacing";
 import Colors from "@/constants/Colors";
@@ -449,7 +445,7 @@ const Cart2 = () => {
           </View>
         ))}
 
-        {cartItems.length > 0 && (
+        {/* {cartItems.length > 0 && (
           <TouchableOpacity
             onPress={async () => {
               if (!isAuthenticated) {
@@ -472,7 +468,7 @@ const Cart2 = () => {
               </Text>
             </View>
           </TouchableOpacity>
-        )}
+        )} */}
 
         {/* Modal information */}
         <View

@@ -9,8 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import Spacing from "@/constants/Spacing";
 import HeaderPage from "@/components/HeaderPage/HeaderPage";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import Loading from "@/components/Loading/Loading";
 import { callGetBlogs } from "@/services/api-call";
 import { router } from "expo-router";
@@ -44,7 +42,7 @@ const BlogList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [blogData, setBlogData] = useState<BlogData[] | []>([]);
 
-  console.log(blogData);
+  // console.log(blogData);
 
   const fetchBlogs = async (page = 0) => {
     const pageSize = 8;
@@ -170,7 +168,7 @@ const BlogList = () => {
                     styles.title,
                     {
                       fontSize: FontSize.medium,
-                      height: FontSize.medium * 2,
+                      height: FontSize.medium * 2.6,
                     },
                   ]}
                 >

@@ -114,22 +114,7 @@ export default function RootLayout() {
           <SafeAreaView style={styles.container}>
             <Stack>
               <Stack.Screen options={{ headerShown: false }} name="(tabs)" />
-              <Stack.Screen
-                options={{ headerShown: false }}
-                name="(test)/test"
-              />
-              <Stack.Screen
-                options={{ headerShown: false }}
-                name="(test)/dropdown"
-              />
-              <Stack.Screen
-                options={{ headerShown: false }}
-                name="(test)/imgselect"
-              />
-              <Stack.Screen
-                options={{ headerShown: false }}
-                name="(test)/swipe"
-              />
+              <Stack.Screen name="+not-found" options={{ headerShown: false }} />
 
               <Stack.Screen
                 name="(auth)/welcome"
@@ -153,6 +138,10 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="(task)/orderSuccess"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="(task)/aboutus"
                 options={{ headerShown: false }}
               />
 

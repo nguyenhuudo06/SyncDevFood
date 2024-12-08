@@ -72,10 +72,6 @@ export interface DishDetail {
 const ProductDetails = () => {
   const route = useRoute();
   const { productId } = route.params;
-  const [bottomModal, setBottomModal] = useState({
-    description: false,
-    reviews: false,
-  });
 
   const [dishDetail, setDishDetail] = useState<DishDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -212,33 +208,33 @@ const ProductDetails = () => {
     }
   };
 
-  const getExistingQuantityInCart = (
-    dishId: string,
-    selectedOpts: { [key: string]: string }
-  ) => {
-    return orderState.carts.reduce((total, item) => {
-      if (
-        item.dishId === dishId &&
-        JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOpts)
-      ) {
-        return total + item.quantity;
-      }
-      return total;
-    }, 0);
-  };
+  // const getExistingQuantityInCart = (
+  //   dishId: string,
+  //   selectedOpts: { [key: string]: string }
+  // ) => {
+  //   return orderState.carts.reduce((total, item) => {
+  //     if (
+  //       item.dishId === dishId &&
+  //       JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOpts)
+  //     ) {
+  //       return total + item.quantity;
+  //     }
+  //     return total;
+  //   }, 0);
+  // };
 
-  const formatSelectedOptions = (options: typeof selectedOptions) => {
-    return Object.entries(options).reduce((acc, [key, value]) => {
-      if (value.length > 0) {
-        const formattedOpts = value.map(
-          (option) =>
-            `${option.name} (+ ${option.price.toLocaleString("vi-VN")} VNĐ)`
-        );
-        acc[key] = formattedOpts.join(", ");
-      }
-      return acc;
-    }, {} as { [key: string]: string });
-  };
+  // const formatSelectedOptions = (options: typeof selectedOptions) => {
+  //   return Object.entries(options).reduce((acc, [key, value]) => {
+  //     if (value.length > 0) {
+  //       const formattedOpts = value.map(
+  //         (option) =>
+  //           `${option.name} (+ ${option.price.toLocaleString("vi-VN")} VNĐ)`
+  //       );
+  //       acc[key] = formattedOpts.join(", ");
+  //     }
+  //     return acc;
+  //   }, {} as { [key: string]: string });
+  // };
 
   const getTotalQuantityInCart = (dishId: string) => {
     return orderState.carts.reduce((total, item) => {
@@ -330,7 +326,7 @@ const ProductDetails = () => {
       if (!isRadioSelected) {
         Toast.show({
           type: "customToast",
-          text1: "Please select size before adding to cart!",
+          text1: "Please select size first!",
           onPress: () => Toast.hide(),
         });
         return;
@@ -618,10 +614,6 @@ const ProductDetails = () => {
           <TouchableOpacity
             style={[styles.contentModalButton]}
             onPress={() =>
-              // setBottomModal((prevState) => ({
-              //   ...prevState,
-              //   description: true,
-              // }))
               router.push(`../productDescription/${dishDetail.dishId}`)
             }
           >
@@ -631,10 +623,6 @@ const ProductDetails = () => {
           <TouchableOpacity
             style={[styles.contentModalButton]}
             onPress={() =>
-              // setBottomModal((prevState) => ({
-              //   ...prevState,
-              //   reviews: true,
-              // }))
               router.push(`../productComment/${dishDetail.dishId}`)
             }
           >
@@ -649,62 +637,6 @@ const ProductDetails = () => {
           </View>
         </View>
       </View>
-
-      {/* Description */}
-      <BottomModal
-        visible={bottomModal.description}
-        onTouchOutside={() =>
-          setBottomModal((prevState) => ({
-            ...prevState,
-            description: false,
-          }))
-        }
-        overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
-        height={0.8}
-        width={1}
-        onSwipeOut={() =>
-          setBottomModal((prevState) => ({
-            ...prevState,
-            description: false,
-          }))
-        }
-      >
-        <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
-          <View style={styles.bottomModalContent}>
-            <WebView
-              originWhitelist={["*"]}
-              source={{ html: modifiedHtml }}
-              style={{ width: "100%" }}
-            />
-          </View>
-        </ModalContent>
-      </BottomModal>
-
-      {/* Reviews */}
-      <BottomModal
-        visible={bottomModal.reviews}
-        onTouchOutside={() =>
-          setBottomModal((prevState) => ({
-            ...prevState,
-            reviews: false,
-          }))
-        }
-        overlayBackgroundColor="rgba(0, 0, 0, 0.1)"
-        height={0.8}
-        width={1}
-        onSwipeOut={() =>
-          setBottomModal((prevState) => ({
-            ...prevState,
-            reviews: false,
-          }))
-        }
-      >
-        <ModalContent style={{ flex: 1, backgroundColor: Colors.white }}>
-          <View style={styles.bottomModalContent}>
-            <Comment dishId={productId} />
-          </View>
-        </ModalContent>
-      </BottomModal>
     </ScrollView>
   );
 };

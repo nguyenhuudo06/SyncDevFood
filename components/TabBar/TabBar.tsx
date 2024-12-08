@@ -33,13 +33,14 @@ const TabBar = ({ state, descriptors, navigation }) => {
             position: "absolute",
             top: -6,
             right: -20,
-            width: 30,
+            width: 32,
             height: 20,
             backgroundColor: "rgba(232, 17, 63, 0.87)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             borderRadius: Spacing * 2,
+            overflow: "hidden",
           }}
         >
           <Text
@@ -47,7 +48,11 @@ const TabBar = ({ state, descriptors, navigation }) => {
               color: "white",
               fontFamily: "outfit-regular",
               fontSize: 11,
+              width: "100%",
+              textAlign: "center",
             }}
+            numberOfLines={1} // Giới hạn hiển thị 1 dòng
+            ellipsizeMode="tail" // Hiển thị ... ở cuối nếu vượt quá chiều rộng
           >
             {cartCount}
           </Text>

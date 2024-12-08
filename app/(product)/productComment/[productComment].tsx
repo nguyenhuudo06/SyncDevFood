@@ -11,12 +11,12 @@ const ProductComment = () => {
   const { productComment } = route.params;
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <View style={styles.scrollView}>
       <BackButton />
-      <View style={{ padding: Spacing }}>
+      <View style={{ padding: Spacing, flex: 1 }}>
         <Comment dishId={productComment} />
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

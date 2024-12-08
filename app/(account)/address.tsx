@@ -1,15 +1,12 @@
 import {
   View,
   Text,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import BackButton from "@/components/Material/BackButton";
 import Spacing from "@/constants/Spacing";
 import FontSize from "@/constants/FontSize";
 import Colors from "@/constants/Colors";
@@ -63,6 +60,7 @@ const Address = () => {
     ward: "",
     specificAddress: "",
   });
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [addressType, setAddressType] = useState("home");
   const [formType, setFormType] = useState<"UPDATE" | "CREATE">("CREATE");
@@ -257,7 +255,13 @@ const Address = () => {
         );
       }
 
-      await fetchAddress();
+      setAddressList((prev) => prev.filter((item) => item.id !== addressId));
+      Toast.show({
+        type: "customToast",
+        text1: "Deleted successful!",
+        onPress: () => Toast.hide(),
+        visibilityTime: 1000,
+      });
     } catch (error) {
       console.error("Error occurred:", error);
     }
@@ -472,8 +476,8 @@ const Address = () => {
               selectedTextStyle={styles.selectedTextStyle}
               data={provincesData}
               maxHeight={300}
-              labelField="label"
-              valueField="value"
+              labelField="name"
+              valueField="name"
               placeholder={"Select Province/City"}
               value={address.province}
               onChange={async (item) => {
@@ -500,8 +504,8 @@ const Address = () => {
               selectedTextStyle={styles.selectedTextStyle}
               data={districtsData}
               maxHeight={300}
-              labelField="label"
-              valueField="value"
+              labelField="name"
+              valueField="name"
               placeholder={"Select District"}
               value={address.district}
               disable={!address.province}
@@ -528,8 +532,8 @@ const Address = () => {
               selectedTextStyle={styles.selectedTextStyle}
               data={wardsData}
               maxHeight={300}
-              labelField="label"
-              valueField="value"
+              labelField="name"
+              valueField="name"
               placeholder={"Select Ward"}
               value={address.ward}
               disable={!address.district}
@@ -544,6 +548,7 @@ const Address = () => {
 
             <Text style={styles.label}>Address</Text>
             <TextInput
+              numberOfLines={1}
               style={[styles.input]}
               placeholder="Enter address"
               placeholderTextColor="gray"
@@ -558,6 +563,7 @@ const Address = () => {
 
             <Text style={styles.label}>Phone Number</Text>
             <TextInput
+              numberOfLines={1}
               style={styles.input}
               placeholder="Enter phone number"
               placeholderTextColor="gray"
@@ -629,7 +635,7 @@ const styles = StyleSheet.create({
     padding: Spacing,
   },
   dropdown: {
-    height: Spacing * 4,
+    padding: Spacing,
     borderColor: "gray",
     borderWidth: 0.5,
     borderRadius: 8,
@@ -653,11 +659,10 @@ const styles = StyleSheet.create({
     fontFamily: "outfit-regular",
   },
   input: {
-    height: 40,
     borderColor: "gray",
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 8,
+    padding: Spacing,
     fontSize: 16,
     outlineColor: "transparent",
     marginBottom: Spacing * 1.6,

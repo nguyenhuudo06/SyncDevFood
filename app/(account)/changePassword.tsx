@@ -85,7 +85,7 @@ const ChangePassword = () => {
 
       setLoading(false);
 
-        router.replace("../(tabs)/home");
+      router.replace("../(tabs)/home");
     } catch (error) {
       console.error(error);
 
@@ -103,211 +103,214 @@ const ChangePassword = () => {
   };
 
   return (
-      <ScrollView style={styles.scrollView}>
-        <HeaderPage titlePage="Change Password" />
-        <View style={{ padding: Spacing }}>
-          <Formik
-            initialValues={{
-              password: "",
-              newPassword: "",
-              confirmPassword: "",
-            }}
-            validationSchema={validationSchema}
-            onSubmit={async (values) => {
-              await handleChangePassword(
-                userId ?? "",
-                values.password,
-                values.newPassword
-              );
-            }}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              values,
-              errors,
-              touched,
-            }) => (
-              <>
-                <View style={{ marginBottom: Spacing * 1.6 }}>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setShowPassword((prev) => ({
-                          ...prev,
-                          password: !prev.password,
-                        }))
-                      }
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        right: 0,
-                        transform: [{ translateY: "-50%" }],
-                        marginRight: Spacing,
-                      }}
-                    >
-                      {showPassword.password ? (
-                        <Entypo
-                          name="eye"
-                          size={Spacing * 2}
-                          color={Colors.primary}
-                          style={{ padding: Spacing }}
-                        />
-                      ) : (
-                        <Entypo
-                          name="eye-with-line"
-                          size={Spacing * 2}
-                          color={Colors.gray}
-                          style={{ padding: Spacing }}
-                        />
-                      )}
-                    </TouchableOpacity>
-                    <TextInput
-                      placeholder="Password"
-                      placeholderTextColor={Colors.darkText}
-                      secureTextEntry={!showPassword.password}
-                      style={styles.input}
-                      onChangeText={
-                        (text) => handleChange("password")(text)
-                        // handleChange("password")(text.trim())
-                      }
-                      onBlur={handleBlur("password")}
-                      value={values.password}
-                    />
-                  </View>
-                  <View style={styles.showError}>
-                    {touched.password && errors.password && (
-                      <Text style={[styles.showErrorText]}>
-                        {errors.password}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-
-                <View style={{ marginBottom: Spacing * 1.6 }}>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setShowPassword((prev) => ({
-                          ...prev,
-                          newPassword: !prev.newPassword,
-                        }))
-                      }
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        right: 0,
-                        transform: [{ translateY: "-50%" }],
-                        marginRight: Spacing,
-                      }}
-                    >
-                      {showPassword.newPassword ? (
-                        <Entypo
-                          name="eye"
-                          size={Spacing * 2}
-                          color={Colors.primary}
-                          style={{ padding: Spacing }}
-                        />
-                      ) : (
-                        <Entypo
-                          name="eye-with-line"
-                          size={Spacing * 2}
-                          color={Colors.gray}
-                          style={{ padding: Spacing }}
-                        />
-                      )}
-                    </TouchableOpacity>
-                    <TextInput
-                      placeholder="New password"
-                      placeholderTextColor={Colors.darkText}
-                      secureTextEntry={!showPassword.newPassword}
-                      style={styles.input}
-                      onChangeText={(text) => handleChange("newPassword")(text)}
-                      onBlur={handleBlur("newPassword")}
-                      value={values.newPassword}
-                    />
-                  </View>
-                  <View style={styles.showError}>
-                    {touched.newPassword && errors.newPassword && (
-                      <Text style={[styles.showErrorText]}>
-                        {errors.newPassword}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-
-                <View style={{ marginBottom: Spacing * 1.6 }}>
-                  <View>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setShowPassword((prev) => ({
-                          ...prev,
-                          confirmPassword: !prev.confirmPassword,
-                        }))
-                      }
-                      style={{
-                        position: "absolute",
-                        top: "50%",
-                        right: 0,
-                        transform: [{ translateY: "-50%" }],
-                        marginRight: Spacing,
-                      }}
-                    >
-                      {showPassword.confirmPassword ? (
-                        <Entypo
-                          name="eye"
-                          size={Spacing * 2}
-                          color={Colors.primary}
-                          style={{ padding: Spacing }}
-                        />
-                      ) : (
-                        <Entypo
-                          name="eye-with-line"
-                          size={Spacing * 2}
-                          color={Colors.gray}
-                          style={{ padding: Spacing }}
-                        />
-                      )}
-                    </TouchableOpacity>
-                    <TextInput
-                      placeholder="Confirm password"
-                      placeholderTextColor={Colors.darkText}
-                      secureTextEntry={!showPassword.confirmPassword}
-                      style={styles.input}
-                      onChangeText={(text) =>
-                        handleChange("confirmPassword")(text)
-                      }
-                      onBlur={handleBlur("confirmPassword")}
-                      value={values.confirmPassword}
-                    />
-                  </View>
-                  <View style={styles.showError}>
-                    {touched.confirmPassword && errors.confirmPassword && (
-                      <Text style={[styles.showErrorText]}>
-                        {errors.confirmPassword}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  style={styles.signInButton}
-                  onPress={() => handleSubmit()}
-                >
-                  <Text style={styles.signInText}>
-                    {loading ? (
-                      <ActivityIndicator size="small" color="#fff" />
+    <ScrollView style={styles.scrollView}>
+      <HeaderPage titlePage="Change Password" />
+      <View style={{ padding: Spacing }}>
+        <Formik
+          initialValues={{
+            password: "",
+            newPassword: "",
+            confirmPassword: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={async (values) => {
+            await handleChangePassword(
+              userId ?? "",
+              values.password,
+              values.newPassword
+            );
+          }}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <>
+              <View style={{ marginBottom: Spacing * 1.6 }}>
+                <View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setShowPassword((prev) => ({
+                        ...prev,
+                        password: !prev.password,
+                      }))
+                    }
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      right: 0,
+                      transform: [{ translateY: -(Spacing * 2) }],
+                      marginRight: Spacing,
+                      zIndex: 10,
+                    }}
+                  >
+                    {showPassword.password ? (
+                      <Entypo
+                        name="eye"
+                        size={Spacing * 2}
+                        color={Colors.primary}
+                        style={{ padding: Spacing }}
+                      />
                     ) : (
-                      "Change password"
+                      <Entypo
+                        name="eye-with-line"
+                        size={Spacing * 2}
+                        color={Colors.gray}
+                        style={{ padding: Spacing }}
+                      />
                     )}
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </Formik>
-        </View>
-      </ScrollView>
+                  </TouchableOpacity>
+                  <TextInput
+                    numberOfLines={1}
+                    placeholder="Password"
+                    placeholderTextColor={Colors.darkText}
+                    secureTextEntry={!showPassword.password}
+                    style={styles.input}
+                    onChangeText={(text) => handleChange("password")(text)}
+                    onBlur={handleBlur("password")}
+                    value={values.password}
+                  />
+                </View>
+                <View style={styles.showError}>
+                  {touched.password && errors.password && (
+                    <Text style={[styles.showErrorText]}>
+                      {errors.password}
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              <View style={{ marginBottom: Spacing * 1.6 }}>
+                <View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setShowPassword((prev) => ({
+                        ...prev,
+                        newPassword: !prev.newPassword,
+                      }))
+                    }
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      right: 0,
+                      transform: [{ translateY: -(Spacing * 2) }],
+                      marginRight: Spacing,
+                      zIndex: 10,
+                    }}
+                  >
+                    {showPassword.newPassword ? (
+                      <Entypo
+                        name="eye"
+                        size={Spacing * 2}
+                        color={Colors.primary}
+                        style={{ padding: Spacing }}
+                      />
+                    ) : (
+                      <Entypo
+                        name="eye-with-line"
+                        size={Spacing * 2}
+                        color={Colors.gray}
+                        style={{ padding: Spacing }}
+                      />
+                    )}
+                  </TouchableOpacity>
+                  <TextInput
+                    numberOfLines={1}
+                    placeholder="New password"
+                    placeholderTextColor={Colors.darkText}
+                    secureTextEntry={!showPassword.newPassword}
+                    style={styles.input}
+                    onChangeText={(text) => handleChange("newPassword")(text)}
+                    onBlur={handleBlur("newPassword")}
+                    value={values.newPassword}
+                  />
+                </View>
+                <View style={styles.showError}>
+                  {touched.newPassword && errors.newPassword && (
+                    <Text style={[styles.showErrorText]}>
+                      {errors.newPassword}
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              <View style={{ marginBottom: Spacing * 1.6 }}>
+                <View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setShowPassword((prev) => ({
+                        ...prev,
+                        confirmPassword: !prev.confirmPassword,
+                      }))
+                    }
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      right: 0,
+                      transform: [{ translateY: -(Spacing * 2) }],
+                      marginRight: Spacing,
+                      zIndex: 10,
+                    }}
+                  >
+                    {showPassword.confirmPassword ? (
+                      <Entypo
+                        name="eye"
+                        size={Spacing * 2}
+                        color={Colors.primary}
+                        style={{ padding: Spacing }}
+                      />
+                    ) : (
+                      <Entypo
+                        name="eye-with-line"
+                        size={Spacing * 2}
+                        color={Colors.gray}
+                        style={{ padding: Spacing }}
+                      />
+                    )}
+                  </TouchableOpacity>
+                  <TextInput
+                    numberOfLines={1}
+                    placeholder="Confirm password"
+                    placeholderTextColor={Colors.darkText}
+                    secureTextEntry={!showPassword.confirmPassword}
+                    style={styles.input}
+                    onChangeText={(text) =>
+                      handleChange("confirmPassword")(text)
+                    }
+                    onBlur={handleBlur("confirmPassword")}
+                    value={values.confirmPassword}
+                  />
+                </View>
+                <View style={styles.showError}>
+                  {touched.confirmPassword && errors.confirmPassword && (
+                    <Text style={[styles.showErrorText]}>
+                      {errors.confirmPassword}
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.signInButton}
+                onPress={() => handleSubmit()}
+              >
+                <Text style={styles.signInText}>
+                  {loading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    "Change password"
+                  )}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -327,7 +330,7 @@ const styles = StyleSheet.create({
     marginVertical: Spacing * 3,
   },
   showError: {
-    height: 20,
+    height: Spacing * 2.6,
   },
   showErrorText: {
     fontFamily: "outfit-regular",
